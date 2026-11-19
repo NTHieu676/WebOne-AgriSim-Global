@@ -1,0 +1,12 @@
+# Environment files and Firebase service-account keys kept outside backend/
+.env
+.env.*
+!.env.example
+*-firebase-adminsdk-*.json
+service-account*.json
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
