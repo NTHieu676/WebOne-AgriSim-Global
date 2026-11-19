@@ -1,0 +1,21 @@
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;font-family:var(--font);font-size:14px;line-height:1.5;color:var(--text);background:var(--cream);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p{margin:0}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--teal-700);text-decoration:none;font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:none;box-shadow:var(--focus)!important}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+svg.i{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
+/* nền minh họa theo trang */
+body[data-bg]{background-size:cover;background-position:center bottom;background-attachment:fixed;background-repeat:no-repeat}
+body[data-bg="terrace"]{background-image:url(../images/bg-terrace.jpg)}
+body[data-bg="cream-hills"]{background-image:url(../images/bg-cream-hills.jpg)}
+body[data-bg="sunny-barn"]{background-image:url(../images/bg-sunny-barn.jpg)}
+body[data-bg="mint-house"]{background-image:url(../images/bg-mint-house.jpg)}
+body[data-bg="misty-a"]{background-image:url(../images/bg-misty-rice-a.jpg)}
+body[data-bg="misty-b"]{background-image:url(../images/bg-misty-rice-b.jpg)}
+body[data-bg="misty-c"]{background-image:url(../images/bg-misty-rice-c.jpg)}
