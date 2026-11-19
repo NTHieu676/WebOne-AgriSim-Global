@@ -126,3 +126,8 @@ body:has(.lp){background:var(--cream)}
 @media (max-width:900px){.lp-facts{grid-template-columns:repeat(2,1fr)}.lp-steps{grid-template-columns:1fr}.lp-step{min-height:0}
   .lp-shade{background:linear-gradient(180deg,rgba(255,250,238,.95) 0%,rgba(255,250,238,.85) 60%,rgba(255,250,238,.5) 100%)}.lp-link{display:none}.lp-hero-in{padding-top:88px}}
 @media (max-width:420px){.lp-nav .btn{padding:8px 12px;font-size:12.5px}.lp-cta .btn{flex:1 1 100%}}
+
+/* Nút quay về trang giới thiệu (login/register) */
+.auth-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--teal-800);background:rgba(255,255,255,.88);border-radius:var(--r-pill);padding:7px 14px;box-shadow:var(--shadow-1)}
+.auth-back svg{width:14px;height:14px;transform:rotate(180deg)}
+.auth-back:hover{background:#fff;color:var(--teal-700)}

@@ -4,6 +4,7 @@
   var out=A.qs('out');
   var app=document.getElementById('app');app.className='auth';
   app.innerHTML='<a class="brand" href="../landing/landing.html" aria-label="Về trang giới thiệu"><span class="mark">'+A.icon('leaf')+'</span><div><b>AGRISIM</b><small>GLOBAL</small></div></a>'+
+  '<a class="auth-back" href="../landing/landing.html">'+A.icon('arrow')+'<span>Về trang giới thiệu</span></a>'+
   '<form class="auth-card" id="f" novalidate><h1>Đăng nhập</h1><p class="lead">Tiếp tục lượt chơi của bạn.</p>'+
   (out?'<div class="banner banner-info" role="status">'+A.icon('info')+'<span>Bạn đã đăng xuất. Hẹn gặp lại!</span></div>':'')+
   '<div class="banner banner-error" id="gerr" role="alert" hidden></div>'+

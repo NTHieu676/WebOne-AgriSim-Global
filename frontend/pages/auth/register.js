@@ -5,6 +5,7 @@
   var $=function(i){return document.getElementById(i);};
   function eye(id){return '<button type="button" class="eye" data-for="'+id+'" aria-label="Hiện mật khẩu">'+A.icon('eye')+'</button>';}
   app.innerHTML='<a class="brand" href="../landing/landing.html" aria-label="Về trang giới thiệu"><span class="mark">'+A.icon('leaf')+'</span><div><b>AGRISIM</b><small>GLOBAL</small></div></a>'+
+  '<a class="auth-back" href="../landing/landing.html">'+A.icon('arrow')+'<span>Về trang giới thiệu</span></a>'+
   '<form class="auth-card" id="f" novalidate><h1>Tạo tài khoản</h1><p class="lead">Bắt đầu hành trình nông dân của bạn.</p>'+
   '<div class="banner banner-error" id="gerr" role="alert" hidden></div>'+
   '<div class="field"><label for="nm">Tên hiển thị</label><input class="input" id="nm" placeholder="Ví dụ: Minh Anh" maxlength="40"><div class="err-text" id="enm" hidden></div></div>'+
