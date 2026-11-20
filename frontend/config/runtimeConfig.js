@@ -5,4 +5,4 @@
  * http(s)://<current-host>:3000/api. Before hosting the static frontend,
  * set API_BASE_URL to the public HTTPS URL of the Express service.
  */
-export const API_BASE_URL = "";
+export const API_BASE_URL = "https://webone-agrisim-global.onrender.com";
