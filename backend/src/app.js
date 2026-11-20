@@ -4,6 +4,10 @@ const express = require("express");
 const cors = require("cors");
 
 const playerRoutes = require("./routes/playerRoutes");
+const gameRoutes = require("./routes/gameRoutes");
+const plotRoutes = require("./routes/plotRoutes");
+const marketRoutes = require("./routes/marketRoutes");
+const poolRoutes = require("./routes/poolRoutes");
 
 const app = express();
 
@@ -19,6 +23,14 @@ const allowedOrigins = (process.env.FRONTEND_URL || "")
     .filter(Boolean);
     console.log("Allowed Origins:", allowedOrigins);
 
+function isAllowedOrigin(origin) {
+    if (allowedOrigins.includes(origin)) return true;
+
+    // Live Server can choose a different free port during local development.
+    return process.env.NODE_ENV !== "production"
+        && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+}
+
 app.use(
     cors({
         origin: function (origin, callback) {
@@ -28,7 +40,7 @@ app.use(
                 return callback(null, true);
             }
 
-            if (allowedOrigins.includes(origin)) {
+            if (isAllowedOrigin(origin)) {
                 return callback(null, true);
             }
 
@@ -62,6 +74,10 @@ app.get("/api/health", (req, res) => {
 // ==============================
 
 app.use("/api/player", playerRoutes);
+app.use("/api/game", gameRoutes);
+app.use("/api/plots", plotRoutes);
+app.use("/api/market", marketRoutes);
+app.use("/api/pool", poolRoutes);
 app.use("/api/config", configRoutes);
 
 // ==============================
@@ -99,9 +115,12 @@ app.use((err, req, res, next) => {
     }
 
     // Các lỗi khác
-    res.status(err.status || 500).json({
+    const status = Number(err.status) || 500;
+    res.status(status).json({
         success: false,
-        message: "Internal server error"
+        // Domain services attach a 4xx status to safe, user-actionable messages.
+        // Unexpected server errors stay generic so internals are not exposed.
+        message: status >= 400 && status < 500 && err.message ? err.message : "Internal server error"
     });
 });
 

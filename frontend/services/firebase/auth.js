@@ -4,16 +4,19 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    updateProfile
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
-// Register
-export async function register(email, password) {
+// Firebase Authentication is solely responsible for passwords.
+export async function register(displayName, email, password) {
     const result = await createUserWithEmailAndPassword(
         auth,
         email,
         password
     );
+
+    await updateProfile(result.user, { displayName });
 
     return result.user;
 }

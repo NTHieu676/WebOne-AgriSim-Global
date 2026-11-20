@@ -4,6 +4,7 @@
 !.env.example
 *-firebase-adminsdk-*.json
 service-account*.json
+backend/data/*.sqlite
 
 # Editor and operating-system files
 .vscode/

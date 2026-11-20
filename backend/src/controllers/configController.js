@@ -14,6 +14,26 @@ async function getConfig(req, res, next) {
     }
 }
 
+async function getScenario(req, res, next) {
+    try {
+        const scenario = await configService.getScenario();
+        return res.status(200).json({ success: true, data: scenario });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function getRound(req, res, next) {
+    try {
+        const scenarioRound = await configService.getRound(Number(req.params.round));
+        return res.status(200).json({ success: true, data: scenarioRound });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
-    getConfig
+    getConfig,
+    getScenario,
+    getRound
 };

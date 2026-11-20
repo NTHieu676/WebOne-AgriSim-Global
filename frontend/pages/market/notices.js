@@ -1,9 +1,22 @@
-(function(){var A=AgriSim,F=A.fmt;
-  A.page({id:'market',title:'Thông báo thị trường',sub:'Kịch bản: Đại dịch toàn cầu. Xem lại thông báo của các vòng.',bg:'misty-b',guard:'game',panel:'none',
-    render:function(ctx){var g=ctx.g;if(A.qs('state')==='empty')return '<div class="card"><div class="empty"><div class="ic">'+A.icon('bell')+'</div><h3>Chưa có thông báo nào.</h3><p>Thông báo xuất hiện khi bạn chuyển vòng.</p></div></div>';
-      var rows=A.NOTICES.map(function(n,i){var r=i+1;
-        if(r>g.round)return '<div class="notice-row lock"><span class="r">Vòng '+r+'</span><div style="flex:1">Chưa mở – xuất hiện khi bạn chuyển vòng</div>'+A.icon('lock')+'</div>';
-        var cur=r===g.round&&!ctx.ro;return '<div class="notice-row '+(cur?'cur':'')+'"><span class="r">Vòng '+r+'</span><div style="flex:1"><b>'+F.esc(n.t)+(cur?' <span class="badge b-warning" style="margin-left:6px">'+A.icon('alert')+' Hiện tại</span>':'')+'</b>'+F.esc(n.d)+'</div></div>';}).join('');
-      return '<div class="card"><div class="notice-list">'+rows+'</div></div>';}
-  });
-})();
+import { A, gameData, shell } from "../../services/ui/gameScreen.js";
+
+const app = document.getElementById("app");
+app.className = "shell";
+app.innerHTML = '<main class="main"><section class="content"><div class="skel" style="height:360px;border-radius:24px"></div></section></main>';
+
+try {
+  const { game } = await gameData();
+  const notices = [
+    ["Khởi động mùa vụ", "Chọn khu vực và gieo lúa để bắt đầu lượt chơi."],
+    ["Thị trường biến động", "Giá hàng hóa thay đổi theo từng vòng và theo khu vực."],
+    ["Vận chuyển liên khu vực", "Chuyến hàng sẽ xuất hiện tại Thị trường khi API vận chuyển được mở."],
+    ["Cập nhật pool thanh khoản", "Kiểm tra phí và dự trữ trước khi xác nhận trao đổi."],
+    ["Giai đoạn cuối mùa", "Cân nhắc số dư và hàng tồn trước vòng cuối."],
+    ["Tổng kết mùa vụ", "Bảng tổng kết sẽ mở khi lượt chơi hoàn thành."]
+  ];
+  const body = `<div class="card"><div class="notice-list">${notices.map(([title, detail], index) => { const round = index + 1; const current = round === game.currentRound; const locked = round > game.currentRound; return `<div class="notice-row ${current ? "cur" : ""} ${locked ? "lock" : ""}"><span class="r">Vòng ${round}</span><div style="flex:1"><b>${locked ? "Chưa mở" : title}${current ? ' <span class="badge b-warning" style="margin-left:6px">Hiện tại</span>' : ""}</b><span>${locked ? "Thông báo này sẽ hiển thị khi bạn chuyển tới vòng tương ứng." : detail}</span></div>${locked ? A.icon("lock") : ""}</div>`; }).join("")}</div></div>`;
+  app.innerHTML = shell("market", "Thông báo thị trường", "Các cập nhật được mở dần theo tiến trình mùa vụ.", body);
+} catch (error) {
+  app.className = "auth";
+  app.innerHTML = `<div class="auth-card"><h1>Chưa tải được Thông báo</h1><div class="banner banner-error">${A.icon("err")}<span>Không kết nối được API.</span></div><a class="btn btn-primary" href="market.html">Về Thị trường</a></div>`;
+}
