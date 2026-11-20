@@ -35,7 +35,8 @@ startButton.addEventListener("click", async () => {
         startButton.textContent = "Bắt đầu lượt chơi";
         const banner = document.getElementById("error");
         banner.hidden = false;
-        banner.innerHTML = `${A.icon("err")}<span>${error.status === 409 ? "Tài khoản đã có lượt chơi. Đang chuyển đến trang chủ…" : "Chưa thể khởi tạo lượt chơi. Hãy kiểm tra backend rồi thử lại."}</span>`;
+        const detail = error.message || "Không nhận được phản hồi từ API.";
+        banner.innerHTML = `${A.icon("err")}<span>${error.status === 409 ? "Tài khoản đã có lượt chơi. Đang chuyển đến trang chủ…" : `Chưa thể khởi tạo lượt chơi${error.status ? ` (HTTP ${error.status})` : ""}: ${detail}`}</span>`;
         if (error.status === 409) window.setTimeout(() => window.location.replace("../dashboard/dashboard.html"), 1000);
     }
 });

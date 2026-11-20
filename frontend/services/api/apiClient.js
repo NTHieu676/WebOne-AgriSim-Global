@@ -36,8 +36,9 @@ export async function apiRequest(endpoint, options = {}) {
     // 1. FIREBASE AUTHENTICATION
     // ==============================
 
+    let user = null;
     if (requireAuth) {
-        const user = await getAuthenticatedUser();
+        user = await getAuthenticatedUser();
 
         if (!user) {
             const error = new Error("User is not logged in");
@@ -50,14 +51,17 @@ export async function apiRequest(endpoint, options = {}) {
         requestHeaders.Authorization = `Bearer ${token}`;
     }
 
-    // ==============================
-    // 2. SEND REQUEST
-    // ==============================
+    const send = () => fetch(`${API_BASE_URL}${endpoint}`, { ...fetchOptions, headers: requestHeaders });
+    let response = await send();
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...fetchOptions,
-        headers: requestHeaders
-    });
+    // An ID token can be cached after a long-lived browser session. A 401 is
+    // returned before the backend executes a command, so retrying once with a
+    // forced Firebase refresh cannot duplicate a financial/gameplay action.
+    if (response.status === 401 && requireAuth && user && !forceTokenRefresh) {
+        const refreshedToken = await user.getIdToken(true);
+        requestHeaders.Authorization = `Bearer ${refreshedToken}`;
+        response = await send();
+    }
 
     // ==============================
     // 3. PARSE RESPONSE

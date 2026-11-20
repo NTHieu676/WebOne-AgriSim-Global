@@ -35,7 +35,11 @@
       });
       source.remove();
     }
-    if (!persistent.querySelector("[data-logout]")) {
+    // Dashboard and Farm keep account actions in the header avatar, matching
+    // their focused desktop layouts. Other pages retain the sidebar action.
+    const usesHeaderAccount = app?.classList.contains("dashboard-shell") || app?.classList.contains("farm-shell");
+    if (usesHeaderAccount) persistent.querySelector(".sidebar-logout")?.remove();
+    if (!usesHeaderAccount && !persistent.querySelector("[data-logout]")) {
       const logout = document.createElement("button");
       logout.type = "button";
       logout.className = "sidebar-logout";
@@ -49,6 +53,9 @@
   }
   function syncNoticeTrigger() {
     const app = document.getElementById("app");
+    // Farm has a permanently visible market column, so adding the drawer
+    // trigger here would duplicate the information shown in that column.
+    if (app?.classList.contains("farm-shell")) return;
     if (!app?.querySelector(".panel")) return;
     const topbar = app.querySelector(".topbar");
     if (!topbar || topbar.querySelector("[data-market-notices]")) return;

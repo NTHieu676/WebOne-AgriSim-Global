@@ -28,6 +28,9 @@ async function verifyToken(req, res, next) {
 
         next();
     } catch (error) {
+        // Keep the client response generic, but preserve the actionable
+        // Firebase Admin diagnostic in server logs for local troubleshooting.
+        console.error("Firebase token verification failed:", error.code || "UNKNOWN", error.message);
         return res.status(401).json({
             success: false,
             message: "Unauthorized: Invalid token"
