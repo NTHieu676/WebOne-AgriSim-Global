@@ -11,8 +11,8 @@
   },
   "scripts": {
     "db:init": "node sqlite/init.js",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node sqlite/init.js && node src/server.js",
+    "dev": "node sqlite/init.js && nodemon src/server.js",
     "test": "node --test"
   }
 }
