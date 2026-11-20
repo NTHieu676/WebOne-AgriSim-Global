@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgriSim Global</title>
+  <script src="assets/js/icons.js"></script>
+</head>
+<body>
+  <p style="font-family:system-ui,sans-serif;padding:24px">Đang mở AgriSim Global…</p>
+  <script type="module">
+    import { observeAuth } from "./services/firebase/auth.js";
+    import { apiRequest } from "./services/api/apiClient.js";
+
+    const go = (page) => window.location.replace(`pages/${page}`);
+    observeAuth(async (user) => {
+      if (!user) return go("landing/landing.html");
+      try {
+        const result = await apiRequest("/game/dashboard");
+        const game = result.data?.game;
+        if (!game) return go("game/startgame.html");
+        return go(game.status === "FINISHED" ? "game/endgame.html" : "dashboard/dashboard.html");
+      } catch {
+        go("landing/landing.html");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,30 +1,95 @@
 import { auth } from "../firebase/firebase.js";
+import { observeAuth } from "../firebase/auth.js";
+import { API_BASE_URL } from "../../config/apiConfig.js";
 
-const API_URL = "http://localhost:3000/api";
+// ==============================
+// API CLIENT
+// ==============================
 
-export async function apiRequest(endpoint, options = {}) {
-    const user = auth.currentUser;
-
-    if (!user) {
-        throw new Error("User is not logged in");
+function getAuthenticatedUser() {
+    if (auth.currentUser) {
+        return Promise.resolve(auth.currentUser);
     }
 
-    const token = await user.getIdToken();
-
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-
-        headers: {
-            "Content-Type": "application/json",
-            ...options.headers,
-            "Authorization": `Bearer ${token}`
-        }
+    return new Promise((resolve) => {
+        const unsubscribe = observeAuth((user) => {
+            unsubscribe();
+            resolve(user);
+        });
     });
+}
 
-    const data = await response.json();
+export async function apiRequest(endpoint, options = {}) {
+    const {
+        requireAuth = true,
+        forceTokenRefresh = false,
+        headers = {},
+        ...fetchOptions
+    } = options;
+
+    const requestHeaders = {
+        "Content-Type": "application/json",
+        ...headers
+    };
+
+    // ==============================
+    // 1. FIREBASE AUTHENTICATION
+    // ==============================
+
+    let user = null;
+    if (requireAuth) {
+        user = await getAuthenticatedUser();
+
+        if (!user) {
+            const error = new Error("User is not logged in");
+            error.code = "AUTH_REQUIRED";
+            throw error;
+        }
+
+        const token = await user.getIdToken(forceTokenRefresh);
+
+        requestHeaders.Authorization = `Bearer ${token}`;
+    }
+
+    const send = () => fetch(`${API_BASE_URL}${endpoint}`, { ...fetchOptions, headers: requestHeaders });
+    let response = await send();
+
+    // An ID token can be cached after a long-lived browser session. A 401 is
+    // returned before the backend executes a command, so retrying once with a
+    // forced Firebase refresh cannot duplicate a financial/gameplay action.
+    if (response.status === 401 && requireAuth && user && !forceTokenRefresh) {
+        const refreshedToken = await user.getIdToken(true);
+        requestHeaders.Authorization = `Bearer ${refreshedToken}`;
+        response = await send();
+    }
+
+    // ==============================
+    // 3. PARSE RESPONSE
+    // ==============================
+
+    const contentType = response.headers.get("content-type");
+
+    let data = null;
+
+    if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        data = await response.text();
+    }
+
+    // ==============================
+    // 4. HANDLE HTTP ERRORS
+    // ==============================
 
     if (!response.ok) {
-        throw new Error(data.message || "API request failed");
+        const errorMessage =
+            data?.message ||
+            data?.error ||
+            `API request failed (${response.status})`;
+
+        const error = new Error(errorMessage);
+        error.status = response.status;
+        throw error;
     }
 
     return data;

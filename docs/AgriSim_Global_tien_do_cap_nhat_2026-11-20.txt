@@ -1,0 +1,57 @@
+AGRISIM GLOBAL - CẬP NHẬT TIẾN ĐỘ
+Ngày cập nhật: 20/11/2026
+
+VỊ TRÍ HIỆN TẠI
+GIAI ĐOẠN 1 - NỀN TẢNG KỸ THUẬT
+GIAI ĐOẠN 2 - THIẾT KẾ VÀ KẾT NỐI DỮ LIỆU
+MỤC 2.2 - XÂY DỰNG LỚP TRUY CẬP FIRESTORE
+Trạng thái: HOÀN THÀNH NỀN TẢNG.
+- Đã có playerRepository, gameRepository và plotRepository theo kiến trúc route → controller → service → repository.
+- Đã kiểm thử thật Dashboard: game ACTIVE vòng 1, 2.000 USDG, 1 plot EMPTY, 2 pool, 1 lịch sử được đọc từ Firestore.
+- Các repository cho lot/shipment/history mutation sẽ được bổ sung cùng từng module nghiệp vụ để giữ transaction đúng phạm vi.
+
+MỤC 1.8 - HOÀN THIỆN VÀ KIỂM THỬ XÁC THỰC FIREBASE
+Trạng thái: HOÀN THÀNH.
+
+Các file đã tạo/sửa:
+- frontend/pages/auth/login.html, frontend/pages/auth/login.js
+- frontend/pages/auth/register.html, frontend/pages/auth/register.js
+- frontend/services/firebase/auth.js
+- frontend/services/api/apiClient.js
+- frontend/README.md
+
+Kết quả kiểm thử:
+- GET /api/health: 200 PASS.
+- GET /api/config: 200 PASS.
+- GET /api/player/profile không có token: 401 PASS.
+- GET /api/player/profile với token giả: 401 PASS.
+- CORS/preflight từ http://localhost:5500: PASS.
+- Đăng nhập Firebase với testemail@gmail.com: backend xác minh token thật thành công,
+  UID 2p4MzMkDVBUW6H7SGCDwyXQEktm2.
+
+MỤC 1.9 - HOÀN THIỆN API HỒ SƠ NGƯỜI CHƠI CƠ BẢN
+Trạng thái: HOÀN THÀNH.
+
+Các file đã tạo/sửa:
+- Tạo backend/src/repositories/playerRepository.js.
+- Tạo backend/src/services/playerService.js.
+- Tạo backend/src/controllers/playerController.js.
+- GET /api/player/profile dùng UID từ token đã xác minh để tạo idempotent và đọc users/{uid}.
+- Document chỉ chứa uid (document id), displayName, email, createdAt, updatedAt.
+
+Kết quả kiểm thử thật:
+- Firestore đã tạo users/2p4MzMkDVBUW6H7SGCDwyXQEktm2.
+- Document có email testemail@gmail.com, displayName null, createdAt và updatedAt là Timestamp.
+
+MỤC 2.1 - THIẾT KẾ DỮ LIỆU FIRESTORE
+Trạng thái: HOÀN THÀNH.
+- Tài liệu cấu trúc đã lưu tại docs/firestore-schema.md.
+- Bao phủ users, games, plots, lots, pools, shipments, history và commands.
+- Quy định toàn bộ dữ liệu động chỉ được backend truy cập; các vấn đề [C] ảnh hưởng tài chính được ghi rõ, chưa tự quyết định.
+
+CHUẨN BỊ CHO CÁC MỤC 2.3–2.5 (CHƯA ĐÁNH DẤU HOÀN THÀNH DO MỤC 2.2 ĐANG THỰC HIỆN)
+- Đã thêm better-sqlite3, backend/sqlite/schema.sql, backend/sqlite/seed.sql và lệnh npm.cmd run db:init.
+- Seed có 24 cấu hình, 6 thông báo, 6 vòng kịch bản; truy vấn SQL đã kiểm tra đúng dữ liệu vòng 3.
+- Đã thay config repository bằng SQLite read-only và thêm GET /api/config/scenario, GET /api/config/rounds/:round.
+- Kiểm thử trên backend cổng 3001: ba endpoint trả 200, dữ liệu seed đúng.
+- Đã chốt precision: giữ tối đa 8 chữ số thập phân nội bộ, không làm tròn trung gian, hiển thị USDG 2 chữ số.

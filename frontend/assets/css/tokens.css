@@ -1,0 +1,15 @@
+/* AgriSim Global – design tokens (lấy từ Figma). Chỉ sửa màu/cỡ chữ ở đây. */
+:root{
+  --font:'Plus Jakarta Sans','Be Vietnam Pro','Segoe UI',system-ui,sans-serif;
+  --teal-900:#0A4A41; --teal-800:#0C5A4E; --teal-700:#0F6B5A; --teal-600:#1A8068; --teal-100:#D8EEEA; --teal-50:#EAF6F2;
+  --lime:#C9E35B; --lime-text:#243008; --orange:#FF8F2B; --orange-600:#EE7F17; --orange-100:#FFE8D0; --peach:#F5D5BD;
+  --cream:#FCF5E5; --navy:#12343B; --navy-2:#1B4A4C; --panel:#21444E;
+  --text:#12212B; --text-muted:#5F7480; --text-disabled:#A5B5BA;
+  --surface:rgba(255,255,255,.92); --surface-solid:#fff; --border:#E1ECEB; --border-strong:#BFD4D2; --field:#F4F8F7;
+  --success:#23813A; --success-bg:#E3F5E7; --warning:#9A5B00; --warning-bg:#FFF0D3; --danger:#C62828; --danger-bg:#FDEBEA; --info:#1F5FA8; --info-bg:#E6F0FB;
+  --asia:#C2570C; --asia-bg:#FDECDB; --europe:#2F5FB3; --europe-bg:#E4EDFB;
+  --r-card:24px; --r-md:16px; --r-sm:12px; --r-pill:999px;
+  --shadow-1:0 10px 30px rgba(18,70,80,.08); --shadow-2:0 18px 44px rgba(18,70,80,.18);
+  --focus:0 0 0 3px rgba(15,107,90,.35);
+  --sidebar-w:248px; --panel-w:340px;
+}
