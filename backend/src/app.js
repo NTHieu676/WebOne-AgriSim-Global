@@ -17,11 +17,21 @@ const configRoutes = require("./routes/configRoutes");
 // 1. CORS CONFIGURATION
 // ==============================
 
-const allowedOrigins = (process.env.FRONTEND_URL || "")
+const configuredOrigins = (process.env.FRONTEND_URL || "")
     .split(",")
     .map(origin => origin.trim())
     .filter(Boolean);
-    console.log("Allowed Origins:", allowedOrigins);
+
+// The public Firebase Hosting origins for this project are safe production
+// defaults. FRONTEND_URL remains available for previews and local testing.
+const hostedOrigins = process.env.NODE_ENV === "production"
+    ? [
+        "https://web1-agrisim-global.web.app",
+        "https://web1-agrisim-global.firebaseapp.com"
+    ]
+    : [];
+const allowedOrigins = [...new Set([...configuredOrigins, ...hostedOrigins])];
+console.log("Allowed Origins:", allowedOrigins);
 
 function isAllowedOrigin(origin) {
     if (allowedOrigins.includes(origin)) return true;
