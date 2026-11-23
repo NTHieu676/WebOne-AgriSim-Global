@@ -119,6 +119,12 @@
     event.preventDefault();
     if (!await import("../../services/ui/dialog.js").then(({ logoutDialog }) => logoutDialog())) return;
     button.disabled = true;
+    const { clearDemoSession, isDemoSession } = await import("../../services/demo/demoSession.js");
+    if (isDemoSession()) {
+      clearDemoSession();
+      window.location.replace(new URL("../../pages/auth/login.html", location.href));
+      return;
+    }
     const { logout } = await import("../../services/firebase/auth.js");
     await logout();
     window.location.replace(new URL("../../pages/auth/login.html", location.href));

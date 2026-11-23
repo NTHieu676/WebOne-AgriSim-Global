@@ -7,14 +7,16 @@ let selectedRegion = null;
 document.body.setAttribute("data-bg", "terrace");
 app.className = "auth";
 app.innerHTML = `
-  <a class="brand" href="../landing/landing.html"><span class="mark">${A.icon("leaf")}</span><div><b>AGRISIM</b><small>GLOBAL</small></div></a>
-  <div class="auth-card start-card"><div class="role"><span class="badge b-info">${A.icon("user")} Vai trò duy nhất</span><h1>Bạn là Nông dân</h1><p class="lead">Quản lý mùa vụ, vận chuyển liên khu vực và giao dịch qua pool trong 6 vòng.</p>
-  <div class="step"><span class="ic">${A.icon("sprout")}</span><div><b>Trồng lúa và thu hoạch</b><small>Thu hoạch đúng vòng để giữ chất lượng 100%.</small></div></div>
-  <div class="step"><span class="ic">${A.icon("clock")}</span><div><b>Chơi tối đa 6 vòng</b><small>Theo dõi biến động thị trường qua từng vòng.</small></div></div></div>
-  <div><h2 style="font-size:19px;font-weight:800">Chọn khu vực khởi đầu</h2><p class="help">Lựa chọn này không thay đổi trong lượt chơi.</p><div class="banner banner-error" id="error" hidden></div>
-  <div class="region-grid"><label class="region-opt" data-region="CHAU_A"><input type="radio" name="region">${A.icon("leaf")}<b>Châu Á</b><small>Vùng lúa đồng bằng.</small></label><label class="region-opt" data-region="CHAU_AU"><input type="radio" name="region">${A.icon("tag")}<b>Châu Âu</b><small>Thị trường xuất khẩu.</small></label></div>
-  <div class="rows"><div class="row"><span>Tài sản ban đầu</span><b>2.000 USDG</b></div><div class="row"><span>Ô ruộng</span><b>1 ô trống</b></div><div class="row"><span>Kho</span><b>Trống</b></div><div class="row"><span>Pool</span><b>Lúa–USDG, Vàng–USDG</b></div></div>
-  <div class="acts"><button class="btn btn-primary" id="start" disabled>Bắt đầu lượt chơi</button></div></div></div>`;
+  <main class="login-stage startgame-stage"><a class="login-brand" href="../landing/landing.html"><span class="mark"><img src="../../assets/images/SVG.svg" alt=""></span><span><b>AGRISIM</b><small>GLOBAL</small></span></a><div class="auth-card start-card">
+    <section class="start-intro"><span class="start-role">${A.icon("user")} Vai trò duy nhất</span><h1>Bạn là Nông dân</h1><p>Trồng lúa, vận chuyển liên khu vực và giao dịch qua pool trong 6 vòng.</p>
+      <div class="start-steps"><div class="step"><span class="ic"><img src="../../assets/images/grass.svg" alt=""></span><div><b><span class="step-number">1.</span> Trồng lúa và thu hoạch</b><small>Thu hoạch đúng vòng để giữ chất lượng 100%.</small></div></div><div class="step"><span class="ic"><img src="../../assets/images/trade.svg" alt=""></span><div><b><span class="step-number">2.</span> Bán, gửi hàng hoặc trao đổi qua pool</b><small>Lựa chọn thị trường và quản lý tài sản linh hoạt.</small></div></div><div class="step"><span class="ic"><img src="../../assets/images/time.svg" alt=""></span><div><b><span class="step-number">3.</span> Chuyển vòng · chơi tối đa 6 vòng</b><small>Theo dõi biến động thị trường qua từng vòng.</small></div></div></div>
+    </section>
+    <section class="start-selection"><div class="start-selection-heading"><h2>Chọn khu vực khởi đầu</h2><p>Hãy chọn một khu vực để tiếp tục.</p></div><div class="banner banner-error" id="error" hidden></div>
+      <div class="region-grid"><label class="region-opt" data-region="CHAU_A"><input type="radio" name="region"><b>Châu Á</b><i aria-hidden="true"></i><div class="region-copy"><h3 style="font-size:16px">Vùng lúa đồng bằng</h3><p>Lúa được thu hoạch tại khu vực <p>này.</p></p></div></label><label class="region-opt" data-region="CHAU_AU"><input type="radio" name="region"><b>Châu Âu</b><i aria-hidden="true"></i><div class="region-copy"><h3 style="font-size:16px">Thị trường xuất khẩu</h3><p>Lúa được thu hoạch tại khu vực <p>này.</p></p></div></label></div>
+      <div class="start-summary"><div><span>Tài sản ban đầu</span><b>2.000 USDG</b></div><div><span>Ô ruộng</span><b>1 ô trống</b></div><div><span>Kho hàng</span><b>Trống</b></div><div><span>Pool</span><b>2 pool khả dụng</b></div></div>
+      <div class="start-actions"><button class="btn btn-primary" id="start" disabled>Bắt đầu</button></div>
+    </section>
+  </div></main>`;
 
 const startButton = document.getElementById("start");
 document.querySelectorAll("[data-region]").forEach((option) => option.addEventListener("click", () => {
