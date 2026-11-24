@@ -1,44 +1,21 @@
-import { apiRequest } from "../../services/api/apiClient.js";
-
-const A = window.AgriSim;
-const app = document.getElementById("app");
-let selectedRegion = null;
-
-document.body.setAttribute("data-bg", "terrace");
-app.className = "auth";
-app.innerHTML = `
-  <main class="login-stage startgame-stage"><a class="login-brand" href="../landing/landing.html"><span class="mark"><img src="../../assets/images/SVG.svg" alt=""></span><span><b>AGRISIM</b><small>GLOBAL</small></span></a><div class="auth-card start-card">
-    <section class="start-intro"><span class="start-role">${A.icon("user")} Vai trò duy nhất</span><h1>Bạn là Nông dân</h1><p>Trồng lúa, vận chuyển liên khu vực và giao dịch qua pool trong 6 vòng.</p>
-      <div class="start-steps"><div class="step"><span class="ic"><img src="../../assets/images/grass.svg" alt=""></span><div><b><span class="step-number">1.</span> Trồng lúa và thu hoạch</b><small>Thu hoạch đúng vòng để giữ chất lượng 100%.</small></div></div><div class="step"><span class="ic"><img src="../../assets/images/trade.svg" alt=""></span><div><b><span class="step-number">2.</span> Bán, gửi hàng hoặc trao đổi qua pool</b><small>Lựa chọn thị trường và quản lý tài sản linh hoạt.</small></div></div><div class="step"><span class="ic"><img src="../../assets/images/time.svg" alt=""></span><div><b><span class="step-number">3.</span> Chuyển vòng · chơi tối đa 6 vòng</b><small>Theo dõi biến động thị trường qua từng vòng.</small></div></div></div>
-    </section>
-    <section class="start-selection"><div class="start-selection-heading"><h2>Chọn khu vực khởi đầu</h2><p>Hãy chọn một khu vực để tiếp tục.</p></div><div class="banner banner-error" id="error" hidden></div>
-      <div class="region-grid"><label class="region-opt" data-region="CHAU_A"><input type="radio" name="region"><b>Châu Á</b><i aria-hidden="true"></i><div class="region-copy"><h3 style="font-size:16px">Vùng lúa đồng bằng</h3><p>Lúa được thu hoạch tại khu vực <p>này.</p></p></div></label><label class="region-opt" data-region="CHAU_AU"><input type="radio" name="region"><b>Châu Âu</b><i aria-hidden="true"></i><div class="region-copy"><h3 style="font-size:16px">Thị trường xuất khẩu</h3><p>Lúa được thu hoạch tại khu vực <p>này.</p></p></div></label></div>
-      <div class="start-summary"><div><span>Tài sản ban đầu</span><b>2.000 USDG</b></div><div><span>Ô ruộng</span><b>1 ô trống</b></div><div><span>Kho hàng</span><b>Trống</b></div><div><span>Pool</span><b>2 pool khả dụng</b></div></div>
-      <div class="start-actions"><button class="btn btn-primary" id="start" disabled>Bắt đầu</button></div>
-    </section>
-  </div></main>`;
-
-const startButton = document.getElementById("start");
-document.querySelectorAll("[data-region]").forEach((option) => option.addEventListener("click", () => {
-    selectedRegion = option.dataset.region;
-    document.querySelectorAll("[data-region]").forEach((item) => item.classList.toggle("sel", item === option));
-    option.querySelector("input").checked = true;
-    startButton.disabled = false;
-}));
-
-startButton.addEventListener("click", async () => {
-    startButton.disabled = true;
-    startButton.innerHTML = '<span class="spin"></span> Đang khởi tạo…';
-    try {
-        await apiRequest("/game/start", { method: "POST", body: JSON.stringify({ region: selectedRegion }) });
-        window.location.replace("../dashboard/dashboard.html");
-    } catch (error) {
-        startButton.disabled = false;
-        startButton.textContent = "Bắt đầu lượt chơi";
-        const banner = document.getElementById("error");
-        banner.hidden = false;
-        const detail = error.message || "Không nhận được phản hồi từ API.";
-        banner.innerHTML = `${A.icon("err")}<span>${error.status === 409 ? "Tài khoản đã có lượt chơi. Đang chuyển đến trang chủ…" : `Chưa thể khởi tạo lượt chơi${error.status ? ` (HTTP ${error.status})` : ""}: ${detail}`}</span>`;
-        if (error.status === 409) window.setTimeout(() => window.location.replace("../dashboard/dashboard.html"), 1000);
-    }
-});
+(function(){var A=AgriSim,F=A.fmt;
+  if(!A.guard('start'))return;
+  document.body.setAttribute('data-bg','terrace');
+  var app=document.getElementById('app');app.className='auth';var sel=null;
+  app.innerHTML='<div class="brand"><span class="mark">'+A.icon('leaf')+'</span><div><b>AGRISIM</b><small>GLOBAL</small></div></div>'+
+  '<div class="auth-card start-card"><div class="role"><span class="badge b-info" style="align-self:flex-start">'+A.icon('user')+' Vai trò duy nhất</span><h1>Bạn là Nông dân</h1>'+
+  '<p class="lead" style="margin:0">Quản lý mùa vụ, vận chuyển liên khu vực và giao dịch qua pool trong 6 vòng.</p>'+
+  [['sprout','1. Trồng lúa và thu hoạch','Gieo trồng trên ô ruộng và thu hoạch đúng vòng để giữ chất lượng 100%.'],['swap','2. Bán, gửi hàng hoặc trao đổi qua pool','Tối ưu giá giữa Châu Á và Châu Âu hoặc hoán đổi Lúa – Vàng.'],['clock','3. Chuyển vòng — chơi tối đa 6 vòng','Theo dõi biến động thị trường qua từng vòng chơi.']].map(function(s){return '<div class="step"><span class="ic">'+A.icon(s[0])+'</span><div><b>'+s[1]+'</b>'+s[2]+'</div></div>';}).join('')+'</div>'+
+  '<div><h2 style="font-size:var(--fs-xl);font-weight:800">Chọn khu vực khởi đầu</h2><p class="help" id="hint" style="margin-bottom:12px">Hãy chọn một khu vực để tiếp tục.</p>'+
+  '<div class="banner banner-error" id="gerr" role="alert" hidden></div>'+
+  '<div class="region-grid">'+[['asia','Vùng lúa đồng bằng'],['europe','Thị trường xuất khẩu']].map(function(r){return '<label class="region-opt" data-r="'+r[0]+'"><input type="radio" name="reg" value="'+r[0]+'">'+F.regionBadge(r[0])+'<b>'+r[1]+'</b><small>Lúa được thu hoạch tại khu vực này.</small></label>';}).join('')+'</div>'+
+  '<div class="rows" style="margin-top:6px"><div class="row"><span>Tài sản ban đầu</span><b>'+F.usdg(A.CFG.startUSDG)+'</b></div><div class="row"><span>Ô ruộng</span><b>'+A.CFG.initPlots+' ô trống</b></div><div class="row"><span>Kho</span><b>Trống</b></div><div class="row"><span>Pool</span><b>Lúa–USDG, Vàng–USDG</b></div></div>'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="help" id="hint2">Hãy chọn một khu vực để tiếp tục.</span><button class="btn btn-primary" id="go" disabled>Bắt đầu</button></div></div></div>';
+  var go=document.getElementById('go');
+  document.querySelectorAll('.region-opt').forEach(function(l){l.onclick=function(){sel=l.dataset.r;document.querySelectorAll('.region-opt').forEach(function(x){x.classList.toggle('sel',x===l);});
+    l.querySelector('input').checked=true;go.disabled=false;document.getElementById('hint2').textContent='Bạn đã chọn khu vực khởi đầu: '+F.region(sel)+'.';};});
+  if(A.qs('state')==='error'){var e=document.getElementById('gerr');e.hidden=false;e.innerHTML=A.icon('err')+'<span>Chưa tạo được lượt chơi. Dữ liệu của bạn không bị thay đổi.</span>';}
+  go.onclick=function(){A.modal.open({icon:'leaf',title:'Xác nhận bắt đầu lượt chơi',sub:'Kiểm tra thông tin khởi tạo trước khi vào vòng 1.',
+    rows:[['Khu vực khởi đầu',F.region(sel)],['Nhận',F.usdg(A.CFG.startUSDG),'pos'],['Ô ruộng',A.CFG.initPlots+' ô trống'],['Pool','Lúa–USDG, Vàng–USDG']],
+    actions:[{label:'Hủy',kind:'outline'},{label:'Xác nhận bắt đầu',keepOpen:true,onClick:async function(){await A.api.startGame(sel);A.go('home');}}]});};
+})();

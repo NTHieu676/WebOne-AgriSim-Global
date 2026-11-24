@@ -4,6 +4,9 @@
     html:function(o,g,ro){
       var u=A.auth.user()||{name:'?'};var ini=u.name.split(/\s+/).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();
       var ttl=o.greeting?'<small>Xin chào,</small><h1>'+F.esc(u.name)+'</h1>':'<h1>'+o.title+'</h1>'+(o.sub?'<p>'+o.sub+'</p>':'');
+      /* Breadcrumb cho trang con: [[routeKey,'Nhãn'],…,[null,'Trang hiện tại']] – mục cuối in đậm, các mục trước là liên kết */
+      if(o.crumbs&&o.crumbs.length)ttl='<nav class="crumbs" aria-label="Vị trí trang"><ol>'+o.crumbs.map(function(c,i){var last=i===o.crumbs.length-1;
+        return '<li>'+(last||!c[0]?'<b aria-current="page">'+F.esc(c[1])+'</b>':'<a href="'+A.url(c[0])+'">'+F.esc(c[1])+'</a>')+'</li>';}).join('')+'</ol></nav>'+ttl;
       var btn;
       if(ro)btn='<span class="pill hide-m" style="color:var(--text-muted)">Lượt chơi đã kết thúc</span>';
       else if(g.round>=A.CFG.rounds)btn='<button class="btn btn-danger" data-act="end">Kết thúc lượt chơi</button>';

@@ -62,9 +62,9 @@
     function fillTo(){var l=pick();var other=l.region==='asia'?'europe':'asia';to.innerHTML='<option value="'+other+'">'+F.region(other)+'</option>';qty.value=l.qty;upd();}
     function upd(){var l=pick(),q=Number(qty.value),err=null;
       if(g.round+C.shipRounds>C.rounds)err='Hàng không kịp đến trước khi lượt chơi kết thúc.';else if(!(q>0&&q<=l.qty))err='Số lượng gửi phải lớn hơn 0 và không vượt '+l.qty+'.';
-      var fee=(q>0?q:0)*C.shipFeePerUnit;if(!err&&fee>g.usdg)err='Không đủ USDG để trả phí vận chuyển.';
+      var unit=A.store.shipUnit(g.round),fee=Math.round((q>0?q:0)*unit*100)/100;if(!err&&fee>g.usdg)err='Không đủ USDG để trả phí vận chuyển.';
       var e=b.querySelector('#serr');e.hidden=!err;if(err)e.innerHTML=A.icon('err')+err;ok.disabled=!!err;
       var dp=A.store.price(to.value,l.type,Math.min(C.rounds,g.round+C.shipRounds));
-      b.querySelector('#srows').innerHTML='<div class="row"><span>Đơn giá phí vận chuyển</span><b>'+F.usdg2(C.shipFeePerUnit)+'/đơn vị</b></div><div class="row"><span>Tổng phí</span><b class="neg">'+F.usdg2(fee)+'</b></div><div class="row"><span>Hàng đến ở</span><b>Vòng '+(g.round+C.shipRounds)+'</b></div><div class="row"><span>Chất lượng dự kiến khi đến</span><b>'+l.quality+'%</b></div><div class="row"><span>Giá thị trường tại '+F.region(to.value)+'</span><b>'+F.usdg2(dp)+'</b></div>';}
+      b.querySelector('#srows').innerHTML='<div class="row"><span>Đơn giá phí vận chuyển</span><b>'+F.usdg2(unit)+'/đơn vị'+(A.store.shipMultiplier(g.round)!==1?' (×'+A.store.shipMultiplier(g.round)+')':'')+'</b></div><div class="row"><span>Tổng phí</span><b class="neg">'+F.usdg2(fee)+'</b></div><div class="row"><span>Hàng đến ở</span><b>Vòng '+(g.round+C.shipRounds)+'</b></div><div class="row"><span>Chất lượng dự kiến khi đến</span><b>'+A.store.shipQuality(l.type,l.quality)+'%</b></div><div class="row"><span>Giá thị trường tại '+F.region(to.value)+'</span><b>'+F.usdg2(dp)+'</b></div>';}
     selL.onchange=fillTo;qty.oninput=upd;fillTo();};
 })(window);

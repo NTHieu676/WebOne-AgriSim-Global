@@ -4,10 +4,36 @@
 !.env.example
 *-firebase-adminsdk-*.json
 service-account*.json
-backend/data/*.sqlite
 
-# Editor and operating-system files
+# Local SQLite database (and its journal / WAL side files)
+backend/data/*.sqlite
+backend/data/*.sqlite-*
+backend/data/*.db
+
+# Dependencies
+node_modules/
+
+# Firebase CLI: deploy cache and emulator / debug logs
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+database-debug.log*
+ui-debug.log*
+
+# Logs and test output
+*.log
+coverage/
+__pycache__/
+*.pyc
+.playwright-mcp/
+
+# Reference archives kept locally (e.g. AgriSim_Frontend.zip)
+/*.zip
+
+# Editor, tool and operating-system files
 .vscode/
 .idea/
+.claude/settings.local.json
 .DS_Store
 Thumbs.db
+desktop.ini
