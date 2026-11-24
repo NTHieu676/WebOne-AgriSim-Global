@@ -45,8 +45,16 @@ Toàn bộ là tiền giả lập; không có kết nối ngân hàng thật.
 | ![](img/pay-3-thanh-cong.jpg) | ![](img/pay-4-that-bai.jpg) |
 | ![](img/pay-5-the-otp.jpg) | ![](img/pay-6-mobile.jpg) |
 
-## 7. Nối cổng thanh toán thật
-Frontend chỉ gọi `AgriSim.api.createPayment({amount,method,bank})` và `AgriSim.api.settlePayment(id,result)`. Khi có backend: tạo đơn ở server, trả về dữ liệu QR; kết quả `paid` do **webhook của cổng thanh toán** quyết định, không để client tự báo thành công.
+## 7. Cách nối với backend trong bản hiện tại
+- UI: `frontend/components/payment/payment.js` chỉ gọi `AgriSim.api.createPayment({amount,method,bank})`, `AgriSim.api.settlePayment(id,result,reason)` và `AgriSim.api.payments()`.
+- Adapter: `frontend/services/api/apiClient.mock.js`.
+  - Đơn nạp (`P-xxxx`, mã `AGSxxxx`, hạn, trạng thái) là bản ghi giả lập phía trình duyệt, lưu `localStorage` theo `agrisim.payments.<uid>` (tối đa 20 đơn). Trạng thái lượt chơi **không** lưu ở client.
+  - Chỉ khi đơn chuyển sang *Thành công* mới gọi `POST /api/game/topup { amount, requestId }`; ví, `totalTopups` và lịch sử `TOPPED_UP` do backend ghi.
+  - `requestId` = mã định danh cố định của đơn, nên khi lỗi mạng rồi bấm lại, backend (idempotent) chỉ cộng tiền **một lần** (BR-P2). Lỗi mạng giữ đơn ở *Đang chờ* để người chơi thử lại.
+  - Tài khoản mẫu: `topup` đi qua `services/demo/demoSession.js`, không cần backend.
+
+## 7b. Nối cổng thanh toán thật
+Khi có cổng thật: tạo đơn ở server, trả về dữ liệu QR; kết quả `paid` do **webhook của cổng thanh toán** quyết định, không để client tự báo thành công.
 
 ## 8. Kiểm thử
-`frontend/tests/e2e_payment.py`: 25 kiểm tra, **25 PASS** (QR thành công/thất bại/hết hạn thật, hủy khi đóng, OTP và PIN sai, đổi phương thức, chống cộng 2 lần, đi từ BPMN-F4 và quay lại mua đất, game kết thúc, mobile).
+`frontend/tests/e2e_payment.py`: 25 kiểm tra, **25 PASS** trên bản frontend mock gốc — cần chạy lại sau khi nối backend (QR thành công/thất bại/hết hạn thật, hủy khi đóng, OTP và PIN sai, đổi phương thức, chống cộng 2 lần, đi từ BPMN-F4 và quay lại mua đất, game kết thúc, mobile).

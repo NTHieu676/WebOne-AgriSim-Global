@@ -1,13 +1,39 @@
 *,*::before,*::after{box-sizing:border-box}
+/* ===== Thanh cuộn =====
+   Trang, panel và modal: ẩn thanh cuộn gốc (vốn chiếm ~10–15px làm bóp bố cục) và thay bằng thanh cuộn NỔI
+   do assets/js/scrollbar.js vẽ (.osb): nền trong suốt, nằm đè lên nội dung, không chiếm chỗ → nội dung luôn
+   vừa khít khung trang, trang ngắn không bị hở mép phải. Các vùng cuộn khác (bảng rộng…) dùng thanh mảnh bên dưới. */
 html{height:100%}
-body{margin:0;min-height:100%;font-family:var(--font);font-size:14px;line-height:1.5;color:var(--text);background:var(--cream);-webkit-font-smoothing:antialiased}
-@view-transition{navigation:auto}
-::view-transition-old(root){animation:page-leave .14s ease both}
-::view-transition-new(root){animation:page-enter .2s ease both}
-@keyframes page-leave{to{opacity:0;transform:translateY(-4px)}}
-@keyframes page-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(18,92,96,.28);border-radius:999px;border:2px solid transparent;background-clip:padding-box;min-height:40px}
+::-webkit-scrollbar-thumb:hover{background-color:rgba(18,92,96,.5)}
+::-webkit-scrollbar-thumb:active{background-color:rgba(18,92,96,.65)}
+/* Vùng nền tối (panel navy): con trượt sáng màu */
+.panel::-webkit-scrollbar-thumb{background-color:rgba(255,255,255,.28)}
+.panel::-webkit-scrollbar-thumb:hover{background-color:rgba(255,255,255,.45)}
+/* Firefox chỉ hỗ trợ thuộc tính chuẩn (Chrome/Edge sẽ bỏ ::-webkit-scrollbar nếu gặp chúng nên giới hạn riêng cho Firefox) */
+@supports (-moz-appearance:none){
+  *{scrollbar-width:thin;scrollbar-color:rgba(18,92,96,.35) transparent}
+  .panel{scrollbar-color:rgba(255,255,255,.35) transparent}
+}
+html,.panel,.modal{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,.panel::-webkit-scrollbar,.modal::-webkit-scrollbar{display:none;width:0;height:0}
+/* Thanh cuộn nổi */
+.osb{position:fixed;z-index:2147483000;width:6px;border-radius:999px;background:rgba(18,92,96,.45);opacity:0;pointer-events:none;transition:opacity .25s ease,width .15s ease,background-color .15s ease}
+.osb.on{opacity:1;pointer-events:auto;cursor:default}
+.osb:hover,.osb.drag{width:9px;background:rgba(18,92,96,.68)}
+.osb.dark{background:rgba(255,255,255,.42)}.osb.dark:hover,.osb.dark.drag{background:rgba(255,255,255,.62)}
+.osb-dragging,.osb-dragging *{user-select:none!important}
+@media (pointer:coarse){.osb.on{pointer-events:none}}
+@media (prefers-reduced-motion:reduce){.osb{transition:none}}
+body{margin:0;min-height:100%;font-family:var(--font);font-size:var(--fs-base);line-height:var(--lh-body);color:var(--text);background:var(--cream);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 h1,h2,h3,h4,p{margin:0}
+/* Tiêu đề: đủ khoảng cho dấu chồng tiếng Việt khi xuống dòng; bẻ dòng cân đối */
+h1,h2,h3,h4{line-height:var(--lh-head);text-wrap:balance}
+p{text-wrap:pretty}
+/* <small> mặc định của trình duyệt là "smaller" (~10.8px) – quá nhỏ cho chữ có dấu */
+small{font-size:var(--fs-xs)}
 button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer}
 a{color:var(--teal-700);text-decoration:none;font-weight:700}
@@ -17,7 +43,7 @@ a{color:var(--teal-700);text-decoration:none;font-weight:700}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 svg.i{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
 /* nền minh họa theo trang */
-body[data-bg]{background-size:cover;background-position:center bottom;background-attachment:scroll;background-repeat:no-repeat}
+body[data-bg]{background-size:cover;background-position:center bottom;background-attachment:fixed;background-repeat:no-repeat}
 body[data-bg="terrace"]{background-image:url(../images/bg-terrace.jpg)}
 body[data-bg="cream-hills"]{background-image:url(../images/bg-cream-hills.jpg)}
 body[data-bg="sunny-barn"]{background-image:url(../images/bg-sunny-barn.jpg)}
@@ -25,9 +51,3 @@ body[data-bg="mint-house"]{background-image:url(../images/bg-mint-house.jpg)}
 body[data-bg="misty-a"]{background-image:url(../images/bg-misty-rice-a.jpg)}
 body[data-bg="misty-b"]{background-image:url(../images/bg-misty-rice-b.jpg)}
 body[data-bg="misty-c"]{background-image:url(../images/bg-misty-rice-c.jpg)}
-.route-loader{position:fixed;inset:0;z-index:500;pointer-events:none;display:grid;place-items:center;background:rgba(255,255,255,.2);backdrop-filter:blur(1px);animation:route-fade .14s ease}
-body.has-persistent-sidebar .route-loader{left:var(--sidebar-w)}
-.route-loader span{width:28px;height:28px;border:3px solid rgba(0,107,90,.22);border-top-color:var(--teal-700);border-radius:50%;animation:spin .65s linear infinite;box-shadow:0 3px 16px rgba(14,40,38,.14)}
-body.is-navigating #app{opacity:.52;transition:opacity .14s ease}
-@keyframes route-fade{from{opacity:0}}
-@media (max-width:900px){body.has-persistent-sidebar .route-loader{left:0}}

@@ -148,7 +148,7 @@ AgriSim-Global/
 │   │   ├── routes/
 │   │   ├── controllers/
 │   │   ├── services/
-│   │   ├── middlewares/
+│   │   ├── middleware/
 │   │   │   └── authMiddleware.js
 │   │   │
 │   │   ├── utils/
@@ -211,7 +211,7 @@ Chứa mã nguồn xử lý nghiệp vụ và cung cấp API.
   `routes/`                   Khai báo các endpoint REST API
   `controllers/`              Tiếp nhận request và trả response
   `services/`                 Xử lý nghiệp vụ và tương tác với database
-  `middlewares/`              Xử lý trung gian trước khi request đến controller
+  `middleware/`              Xử lý trung gian trước khi request đến controller
   `authMiddleware.js`         Xác minh Firebase ID Token
   `utils/`                    Các hàm tiện ích dùng chung trong backend
   `app.js`                    Khởi tạo Express, middleware và đăng ký routes

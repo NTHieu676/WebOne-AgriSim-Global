@@ -1,51 +1,33 @@
-import { A, fmt, gameData, shell } from "../../services/ui/gameScreen.js";
-import { apiRequest } from "../../services/api/apiClient.js";
-import { confirmDialog, numberDialog } from "../../services/ui/dialog.js";
-
-const app = document.getElementById("app");
-app.className = "shell market-shell";
-app.innerHTML = '<main class="main"><section class="content"><div class="skel" style="height:420px;border-radius:24px"></div></section></main>';
-function toast(message, isError = false) { let host = document.querySelector(".toast-host"); if (!host) { host = document.createElement("div"); host.className = "toast-host"; document.body.append(host); } const node = document.createElement("div"); node.className = `toast${isError ? " err" : ""}`; node.innerHTML = `${A.icon(isError ? "err" : "check")}<span>${message}</span>`; host.append(node); setTimeout(() => node.remove(), 3600); }
-
-try {
-  const { game, lots = [], shipments = [] } = await gameData();
-  let prices = {};
-  try { prices = (await apiRequest(`/config/rounds/${game.currentRound}`, { requireAuth: false })).data?.prices || {}; } catch { /* Market still displays owned lots during a config restart. */ }
-  let tab = new URLSearchParams(location.search).get("tab") === "market" ? "market" : "ship";
-  let selectedRegion = game.startRegion || "CHAU_A";
-  const regionName = (value) => value === "CHAU_AU" ? "Châu Âu" : "Châu Á";
-  const assetName = (value) => value === "GOLD" ? "Vàng" : "Lúa";
-  const priceText = (value) => Number.isFinite(Number(value)) ? fmt(value) : "–";
-  const setUrl = () => history.replaceState(null, "", `${location.pathname}${tab === "market" ? "?tab=market" : ""}`);
-  function shipmentTable() {
-    if (!shipments.length) return `<div class="empty"><div class="ic">${A.icon("truck")}</div><h3>Chưa có chuyến hàng nào</h3><p>Gửi lô hàng từ Kho để vận chuyển sang khu vực còn lại.</p><a class="btn btn-outline" href="../inventory/inventory.html">Mở Kho hàng</a></div>`;
-    return `<div class="table-wrap"><table class="tbl"><thead><tr><th>Mã chuyến</th><th>Hàng hóa</th><th>Từ → Đến</th><th>Gửi / đến</th><th>Phí</th><th class="r">Trạng thái</th></tr></thead><tbody>${shipments.map((shipment) => { const transit = shipment.status === "IN_TRANSIT"; const remaining = transit ? Math.max(0, Number(shipment.arrivalRound) - Number(game.currentRound)) : 0; return `<tr><td><b>${shipment.id.slice(0, 8)}</b></td><td>${assetName(shipment.asset)} · ${fmt(shipment.quantity)}${shipment.asset === "RICE" ? ` · ${shipment.qualityPercent}%` : ""}</td><td>${regionName(shipment.origin)} → ${regionName(shipment.destination)}</td><td>V${shipment.sentRound} / V${shipment.arrivalRound}</td><td>${fmt(shipment.shippingFeeUsd)} USDG</td><td class="r">${transit ? `<span class="badge b-info">Còn ${remaining} vòng</span>` : '<a class="badge b-success" href="../inventory/inventory.html">Đã đến kho</a>'}</td></tr>`; }).join("")}</tbody></table></div>`;
-  }
-  function render() {
-    const regionLots = lots.filter((lot) => lot.region === selectedRegion && lot.status === "AVAILABLE");
-    const ricePrice = prices.RICE?.[selectedRegion], goldPrice = prices.GOLD?.[selectedRegion];
-    const canSell = Number.isFinite(Number(ricePrice)) && Number.isFinite(Number(goldPrice));
-    const market = `<div class="region-cards">${["CHAU_A", "CHAU_AU"].map((value) => `<button class="region-card ${selectedRegion === value ? "on" : ""}" data-region="${value}"><b>${regionName(value)}</b><div class="goods"><div class="good"><small>Lúa</small><b>${priceText(prices.RICE?.[value])} USDG</b></div><div class="good"><small>Vàng</small><b>${priceText(prices.GOLD?.[value])} USDG</b></div></div><span class="hint">Giá vòng ${game.currentRound} · bấm để xem hàng</span></button>`).join("")}</div><div class="card"><div class="card-head"><div><h3>Các lô có thể bán tại ${regionName(selectedRegion)}</h3><span class="hint">Giá hiện tại: Lúa ${priceText(ricePrice)} · Vàng ${priceText(goldPrice)} USDG</span></div></div>${regionLots.length ? `<div class="table-wrap"><table class="tbl"><thead><tr><th>Mã lô</th><th>Loại</th><th class="r">Số lượng</th><th>Chất lượng</th><th class="r">Thao tác</th></tr></thead><tbody>${regionLots.map((lot) => `<tr><td><b>${lot.id.slice(0, 8)}</b></td><td>${assetName(lot.asset)}</td><td class="r">${fmt(lot.quantity)}</td><td>${lot.qualityPercent}%</td><td class="r"><button class="btn btn-primary btn-sm" data-sell-lot="${lot.id}" data-sell-quantity="${lot.quantity}" ${canSell && lot.qualityPercent > 0 ? "" : "disabled"}>Bán</button></td></tr>`).join("")}</tbody></table></div>` : `<div class="empty"><div class="ic">${A.icon("box")}</div><h3>Chưa có hàng khả dụng tại khu vực này</h3><p>Hãy thu hoạch hoặc gửi hàng từ khu vực khác.</p><a class="btn btn-primary" href="../farm/farm.html">Đến Nông trại</a></div>`}</div>`;
-    const shipmentsHtml = `<div class="card"><div class="card-head"><div><h3>Chuyến hàng của bạn</h3><span class="hint">Mỗi chuyến đến sau đúng một lần chuyển vòng.</span></div><span class="badge b-muted">${shipments.length} chuyến</span></div>${shipmentTable()}</div>`;
-    app.className = `shell market-shell market-mode-${tab}`;
-    app.innerHTML = shell("market", "Thị trường & Vận chuyển", "Giá hai khu vực, bán hàng và theo dõi lô đang di chuyển.", `<div class="seg market-tabs" aria-label="Nội dung thị trường"><button data-tab="market" class="${tab === "market" ? "on" : ""}">Thị trường</button><button data-tab="ship" class="${tab === "ship" ? "on" : ""}">Chuyến hàng (${shipments.length})</button></div>${tab === "ship" ? shipmentsHtml : market}`);
-    app.querySelector(".topbar")?.insertAdjacentHTML("beforeend", `<span class="page-round">Vòng ${game.currentRound}/6</span><span class="badge b-success">${fmt(game.walletUsdG)} USDG</span><span class="avatar market-avatar">ND</span>`);
-    const inTransit = shipments.filter((shipment) => shipment.status === "IN_TRANSIT").length;
-    app.insertAdjacentHTML("beforeend", `<aside class="market-rail"><div class="market-rail-art"></div><h3>Vận chuyển</h3><div class="market-rail-total"><small>Chuyến đang di chuyển</small><b>${inTransit}</b><span>/${shipments.length} chuyến</span></div><div class="market-rail-note"><span>${A.icon("truck")}</span><div><b>${inTransit ? "Hàng đang trên đường" : "Chưa có hàng vận chuyển"}</b><small>${inTransit ? "Hàng sẽ đến sau khi chuyển vòng." : "Gửi hàng từ Kho để mở rộng thị trường."}</small></div></div><a href="../inventory/inventory.html" class="market-rail-link">Mở Kho hàng →</a></aside>`);
-    app.querySelectorAll("[data-tab]").forEach((button) => button.addEventListener("click", () => { tab = button.dataset.tab; setUrl(); render(); }));
-    app.querySelectorAll("[data-region]").forEach((button) => button.addEventListener("click", () => { selectedRegion = button.dataset.region; render(); }));
-    app.querySelectorAll("[data-sell-lot]").forEach((button) => button.addEventListener("click", async () => {
-      const max = Number(button.dataset.sellQuantity);
-      const quantity = await numberDialog({ title: "Bán hàng", message: "Doanh thu được tính theo giá và chất lượng hiện tại.", label: "Số lượng muốn bán", initial: max, min: 0.00000001, max, confirmLabel: "Tiếp tục" });
-      if (quantity === null) return;
-      if (!await confirmDialog({ title: "Xác nhận bán hàng", message: `Bán ${fmt(quantity)} đơn vị hàng?`, confirmLabel: "Bán hàng" })) return;
-      button.disabled = true; button.innerHTML = '<span class="spin"></span>';
-      try { await apiRequest(`/market/lots/${encodeURIComponent(button.dataset.sellLot)}/sell`, { method: "POST", body: JSON.stringify({ quantity, requestId: crypto.randomUUID() }) }); toast("Bán hàng thành công."); setTimeout(() => window.__agrisimRefresh?.() ?? location.reload(), 500); }
-      catch (error) { button.disabled = false; button.textContent = "Bán"; toast(error.message || "Chưa thể bán lô hàng này.", true); }
-    }));
-  }
-  render();
-} catch (error) {
-  app.className = "auth";
-  app.innerHTML = `<div class="auth-card"><h1>Chưa tải được Thị trường</h1><div class="banner banner-error">${A.icon("err")}<span>${error.status ? `API trả lỗi HTTP ${error.status}.` : "Không kết nối được API."}</span></div><a class="btn btn-primary" href="../dashboard/dashboard.html">Về Trang chủ</a></div>`;
-}
+(function(){var A=AgriSim,F=A.fmt,C=A.CFG;
+  var tab=A.qs('tab')==='ship'?'ship':'market';var reg=null;
+  function tabs(){return '<div class="seg" id="tabs"><button data-t="market" class="'+(tab==='market'?'on':'')+'">Thị trường</button><button data-t="ship" class="'+(tab==='ship'?'on':'')+'">Chuyến hàng</button></div>';}
+  function regionCard(r,ctx){var g=ctx.g,n=A.store.notice(g.round);var pr=function(t){return A.store.price(r,t,g.round);},prev=function(t){return g.round>1?A.store.price(r,t,g.round-1):pr(t);};
+    function ch(t){var d=pr(t)-prev(t);return d>0?'<div class="up">▲ +'+F.num(d)+'</div>':d<0?'<div class="down">▼ −'+F.num(-d)+'</div>':'<div class="hint">Ổn định</div>';}
+    var have={rice:0,gold:0};g.lots.forEach(function(l){if(l.region===r&&l.quality>0)have[l.type]+=l.qty;});
+    return '<button class="region-card '+(reg===r?'on':'')+'" data-r="'+r+'"><div style="display:flex;justify-content:space-between;align-items:center">'+F.regionBadge(r)+(reg===r?'<span class="badge b-success">'+A.icon('check')+' Đang xem</span>':'<span class="link" style="font-size:var(--fs-xs)">Xem khu vực →</span>')+'</div>'+
+      '<div class="hint" style="margin-top:8px;color:var(--orange-600);font-weight:700">Giai đoạn '+(n.phase?String(n.phase).replace(/^GĐ\s*/,''):Math.min(g.round,3))+' · '+F.esc(n.t)+'</div><div class="goods"><div class="good"><small>Lúa</small><b class="num">'+F.usdg2(pr('rice'))+'</b>'+ch('rice')+'</div><div class="good"><small>Vàng</small><b class="num">'+F.usdg2(pr('gold'))+'</b>'+ch('gold')+'</div></div>'+
+      '<div class="hint">Hàng bạn đang có tại đây: <b>'+F.num(have.rice,have.rice%1?2:0)+' lúa · '+F.num(have.gold,have.gold%1?2:0)+' vàng</b></div></button>';}
+  function marketTab(ctx){var g=ctx.g;reg=reg||g.startRegion;var other=reg==='asia'?'europe':'asia';
+    var lots=g.lots.filter(function(l){return l.region===reg&&l.quality>0;});
+    var body=lots.length||A.qs('state')==='empty'&&false?'':'';
+    if(!lots.length)body='<div class="empty"><div class="ic">'+A.icon('box')+'</div><h3>Chưa có hàng tại khu vực này.</h3><p>Hãy thu hoạch, hoặc gửi hàng từ khu vực khác sang '+F.region(reg)+'.</p><div class="acts"><button class="btn btn-primary" data-shipgo'+(ctx.ro?' disabled':'')+'>Gửi hàng</button></div></div>';
+    else body='<div class="table-wrap"><table class="tbl"><thead><tr><th>Mã lô</th><th>Loại</th><th class="r">Số lượng</th><th class="r">Chất lượng</th><th class="r">Giá</th><th class="r">Doanh thu ước tính</th><th class="r">Thao tác</th></tr></thead><tbody>'+
+      lots.map(function(l){var p=A.store.price(reg,l.type,g.round);return '<tr><td><b>'+l.id+'</b></td><td>'+F.good(l.type)+'</td><td class="r num">'+F.num(l.qty,l.qty%1?2:0)+'</td><td class="r num">'+l.quality+'%</td><td class="r num">'+F.usdg2(p)+'</td><td class="r num pos">'+F.usdg2(p*l.qty*l.quality/100)+'</td><td class="r"><button class="btn btn-primary btn-sm" data-sell="'+l.id+'"'+(ctx.ro?' disabled':'')+'>Bán</button></td></tr>';}).join('')+'</tbody></table></div>';
+    return '<div class="region-cards">'+regionCard('asia',ctx)+regionCard('europe',ctx)+'</div><div class="card"><div class="card-head"><h3>Các lô có thể bán tại '+F.region(reg)+'</h3><span class="hint">Doanh thu = Giá × Số lượng × Chất lượng</span></div>'+body+
+      '<div style="text-align:right;margin-top:10px"><a href="#" data-shipgo style="font-size:var(--fs-sm)">Gửi hàng sang '+F.region(other)+' →</a></div></div>';}
+  function shipTab(ctx){var g=ctx.g;var ss=g.shipments;
+    var head='<div class="card-head"><h3>Danh sách chuyến hàng</h3><span class="hint">Phí vận chuyển vòng này: '+F.usdg2(A.store.shipUnit(g.round))+'/đơn vị · Thời gian: '+C.shipRounds+' vòng</span></div>';
+    if(A.qs('state')==='empty'||!ss.length)return '<div class="card">'+head+'<div class="empty"><div class="ic">'+A.icon('truck')+'</div><h3>Chưa có chuyến hàng nào.</h3><p>Gửi lô hàng từ kho sang khu vực khác để tận dụng chênh lệch giá mỗi vòng.</p><div class="acts"><button class="btn btn-primary" data-shipgo'+(ctx.ro?' disabled':'')+'>Gửi hàng</button></div></div></div>';
+    return '<div class="card">'+head+'<div class="table-wrap"><table class="tbl tbl-ship"><thead><tr><th>Mã chuyến</th><th>Hàng</th><th class="r">Số lượng</th><th>Nơi đi → Nơi đến</th><th class="r">Phí đã trả</th><th class="r">Vòng gửi</th><th class="r">Vòng đến</th></tr></thead><tbody>'+
+      ss.map(function(s){return '<tr><td><b>'+s.id+'</b></td><td>'+F.good(s.type)+'</td><td class="r num">'+s.qty+'</td><td>'+F.regionBadge(s.from)+' → '+F.regionBadge(s.to)+'</td><td class="r num">'+F.usdg2(s.fee)+'</td><td class="r">'+s.sentRound+'</td><td class="r">'+s.arriveRound+'</td></tr>';}).join('')+'</tbody></table></div><div class="hint" style="margin-top:10px">'+A.icon('info')+' Chuyến đang đi không thể hủy và hàng trong chuyến không thể bán.</div></div>';}
+  A.page({id:'market',title:'Thị trường & Vận chuyển',sub:'Giá hai khu vực và các chuyến hàng của bạn.',bg:'mint-house',guard:'game',panel:'market',
+    skeleton:function(){return '<div class="skel" style="height:44px;width:260px;border-radius:999px"></div><div class="region-cards"><div class="skel" style="height:200px;border-radius:24px"></div><div class="skel" style="height:200px;border-radius:24px"></div></div><div class="skel" style="height:240px;border-radius:24px"></div>';},
+    render:function(ctx){var hd='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">'+tabs()+(tab==='ship'&&!ctx.ro?'<button class="btn btn-primary btn-sm" data-shipgo>'+A.icon('truck')+' Gửi hàng</button>':'')+'</div>';
+      return hd+(tab==='ship'?shipTab(ctx):marketTab(ctx));},
+    bind:function(ctx,v){
+      v.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){tab=b.dataset.t;history.replaceState(null,'',location.pathname+(tab==='ship'?'?tab=ship':''));ctx.refresh();};});
+      v.querySelectorAll('[data-r]').forEach(function(b){b.onclick=function(){reg=b.dataset.r;ctx.refresh();};});
+      v.querySelectorAll('[data-sell]').forEach(function(b){b.onclick=function(){A.flows.sell(ctx,b.dataset.sell);};});
+      v.querySelectorAll('[data-shipgo]').forEach(function(b){b.onclick=function(e){e.preventDefault();if(ctx.ro)return;A.flows.ship(ctx);};});}
+  });
+})();

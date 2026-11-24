@@ -4,12 +4,17 @@
  * ?state=loading|error|empty để xem nhanh trạng thái theo Figma (empty do trang tự xử lý).
  */
 (function(w){var A=w.AgriSim=w.AgriSim||{};var F=A.fmt;
+  /* Gắn nhãn cột (data-label) cho từng ô để bảng hiển thị dạng thẻ trên điện thoại; ô chứa nút = hàng thao tác */
+  function labelTables(root){root.querySelectorAll('table.tbl').forEach(function(t){
+    var heads=[].map.call(t.querySelectorAll('thead th'),function(th){return th.textContent.trim();});
+    t.querySelectorAll('tbody tr').forEach(function(tr){[].forEach.call(tr.children,function(td,i){td.setAttribute('data-label',heads[i]||'');if(td.querySelector('button,.btn'))td.classList.add('act');});});});}
+  A.labelTables=labelTables;
   function skeleton(){return '<div class="stat-grid">'+[1,2,3,4].map(function(){return '<div class="skel" style="height:104px;border-radius:20px"></div>';}).join('')+'</div><div class="skel" style="height:220px;border-radius:24px"></div><div class="skel" style="height:260px;border-radius:24px"></div>';}
   A.page=function(cfg){
     if(!A.guard(cfg.guard||'game'))return;
     document.body.setAttribute('data-bg',cfg.bg||'cream-hills');
     var state=A.qs('state');var root=document.getElementById('app');
-    var g0=A.store.peek();var ro=g0.status==='ended';
+    var g0=A.store.peek()||{status:'playing',round:1,usdg:0,topup:0,plots:[],lots:[],shipments:[],pools:{rice:{asset:0,usdg:0},gold:{asset:0,usdg:0}},history:[]};var ro=g0.status==='ended';
     var hasPanel=cfg.panel&&cfg.panel!=='none';
     root.className='shell'+(hasPanel?' has-panel':'')+(ro?' is-end':'');
     var ctx={g:g0,d:A.store.derive(g0),ro:ro,cfg:cfg};
@@ -20,7 +25,9 @@
       document.getElementById('tabs').innerHTML=A.sidebar.tabbar(cfg.id);
       var tb=document.getElementById('tb');tb.innerHTML=A.navbar.html(cfg,g,ro);A.navbar.bind(tb,ctx);
       if(hasPanel)document.getElementById('pn').innerHTML=A.panel(cfg.panel,ctx);}
-    function banner(){return ro?'<div class="banner banner-info" role="status">'+A.icon('info')+'<span>Lượt chơi đã kết thúc – bạn chỉ có thể xem.</span></div>':'';}
+    /* Lượt đã kết thúc: mọi trang chỉ xem + liên kết quay về Tổng kết (trừ chính trang Tổng kết) */
+    function banner(){if(!ro)return '';var link=cfg.guard==='end'?'':'<span class="sp"></span><a class="banner-link" href="'+A.url('end')+'">Xem tổng kết →</a>';
+      return '<div class="banner banner-info" role="status">'+A.icon('info')+'<span>Lượt chơi đã kết thúc – bạn chỉ có thể xem.</span>'+link+'</div>';}
     async function load(showSk){
       if(showSk)view.innerHTML=banner()+(cfg.skeleton?cfg.skeleton():skeleton());
       try{
@@ -29,6 +36,7 @@
         var g=await A.api.getGame();ctx.g=g;ctx.d=A.store.derive(g);ctx.ro=ro=g.status==='ended';
         root.classList.toggle('is-end',ro);shell();
         view.innerHTML=banner()+cfg.render(ctx);
+        labelTables(view);
         if(cfg.bind)cfg.bind(ctx,view);
       }catch(e){
         shell();
@@ -57,7 +65,7 @@
       h+=items.slice(0,4).map(function(i){return '<div class="pn-item"><span class="ic">'+A.icon(i[0])+'</span><div><b>'+F.esc(i[1])+'</b><small>'+F.esc(i[2])+'</small></div></div>';}).join('');
       h+='<a class="link" href="'+A.url('notices')+'">Xem tất cả thông báo →</a>';
     }else{
-      h+='<div class="pn-item"><span class="ic">'+A.icon('info')+'</span><div><small>Phí vận chuyển hiện tại là <b style="display:inline">'+F.usdg(A.CFG.shipFeePerUnit,2)+'</b> cho mỗi đơn vị hàng. Hàng đang đi không thể hủy và không thể bán.</small></div></div>';
+      h+='<div class="pn-item"><span class="ic">'+A.icon('info')+'</span><div><small>Phí vận chuyển hiện tại là <b style="display:inline">'+F.usdg(A.store.shipUnit(g.round),2)+'</b> cho mỗi đơn vị hàng'+(A.store.shipMultiplier(g.round)!==1?' (cước ×'+A.store.shipMultiplier(g.round)+' ở vòng này)':'')+'. Hàng đang đi không thể hủy và không thể bán.</small></div></div>';
       h+='<a class="link" href="'+A.url('inventory')+'">Xem kho hàng →</a>';
     }
     return h;};
