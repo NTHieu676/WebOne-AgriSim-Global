@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 const { startGame, getCurrentGame, getDashboard, getHistory, advanceRound, finishGame, getSummary, restartGame, topup } = require("../controllers/gameController");
 
 const router = express.Router();
