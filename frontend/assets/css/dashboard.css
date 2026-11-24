@@ -1,0 +1,328 @@
+/* Dashboard layout derived from DASHBOARD.svg. This module intentionally
+   scopes every rule to the dashboard so it cannot alter the other game pages. */
+.dashboard-shell {
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr) clamp(16rem, 20vw, 19rem);
+  min-height: 100dvh;
+  background: linear-gradient(180deg, rgba(255, 250, 238, .78), rgba(241, 250, 237, .58)), url(../images/bg-terrace.jpg) center bottom / cover fixed no-repeat;
+}
+
+.dashboard-main { min-width: 0; }
+.dashboard-loading { min-height: 32.5rem; border-radius: var(--r-card); }
+.dashboard-topbar { width: min(100%, 78rem); padding-bottom: .6rem; }
+.dashboard-content { width: min(100%, 78rem); padding-top: .35rem; gap: 1rem; }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.46fr) minmax(17.5rem, .88fr);
+  grid-template-areas:
+    "season stats"
+    "lower lower"
+    "activity activity";
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.dashboard-primary { display: contents; }
+.season-card { grid-area: season; }
+.dashboard-stats {
+  grid-area: stats;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  align-content: start;
+}
+.dashboard-lower {
+  grid-area: lower;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(17rem, .85fr);
+  gap: 1rem;
+}
+.activity-card { grid-area: activity; }
+
+.dashboard-stats .stat {
+  min-height: clamp(7.25rem, 11vw, 8.2rem);
+  padding: clamp(.8rem, 1.1vw, 1rem);
+  border-radius: 1.15rem;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.dashboard-stats .stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .8rem 1.8rem rgba(12, 76, 67, .13);
+}
+.dashboard-stats .val { font-size: clamp(1.25rem, 2vw, 1.65rem); }
+.dashboard-stats .stat { min-width: 0; overflow: hidden; }
+.dashboard-stats .stat .lbl { min-width: 0; align-items: flex-start; }
+.dashboard-stats .stat .lbl > span { min-width: 0; overflow-wrap: anywhere; }
+.dashboard-stats .stat .lbl svg { flex: none; margin-top: .05rem; }
+.dashboard-stats .stat .val { min-width: 0; overflow-wrap: anywhere; white-space: normal; line-height: 1.18; }
+.dashboard-stats .stat .val small { display: inline-block; white-space: nowrap; }
+
+.dash-round {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: .44rem .7rem;
+  font-size: .72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.dash-round::before {
+  content: "";
+  width: .34rem;
+  height: .34rem;
+  margin-right: 1.58rem;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: .48rem 0 0 #ffc964, .96rem 0 0 #82c8c0, 1.44rem 0 0 #dce8e5;
+}
+
+.dashboard-shell .season-card {
+  min-height: 17.4rem;
+  padding: clamp(1rem, 1.6vw, 1.35rem);
+}
+.dashboard-shell .season-card .card-head { margin-bottom: .55rem; }
+.dashboard-shell .season-stages {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  position: relative;
+  padding: 1rem .8rem .5rem;
+}
+.dashboard-shell .season-stages::before {
+  content: "";
+  position: absolute;
+  top: 2.72rem;
+  right: 16%;
+  left: 16%;
+  height: .16rem;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--teal-700), var(--teal-700) 50%, var(--border-strong) 50%);
+}
+.dashboard-shell .season-stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: .22rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+.dashboard-shell .season-stage > span {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 3px solid var(--border-strong);
+  border-radius: 50%;
+  place-items: center;
+  background: #fff;
+  color: var(--text-muted);
+}
+.dashboard-shell .season-stage.done > span { border-color: var(--teal-700); color: var(--teal-700); }
+.dashboard-shell .season-stage.current > span { border-color: var(--orange); color: var(--orange); box-shadow: 0 0 0 .3rem #fff3e4; }
+.dashboard-shell .season-stage b { color: var(--text); font-size: .78rem; }
+.dashboard-shell .season-stage small { font-size: .7rem; }
+.dashboard-shell .season-status {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  flex-wrap: wrap;
+  margin-top: .3rem;
+  padding-top: .8rem;
+  border-top: 1px solid var(--border);
+}
+.dashboard-shell .season-status p { flex: 1 1 12rem; min-width: 0; color: var(--text-muted); font-size: .78rem; }
+.dashboard-shell .season-status .btn { margin-left: auto; }
+
+.dashboard-shell .price-card,
+.dashboard-shell .dashboard-net {
+  min-height: clamp(15.25rem, 26vh, 18rem);
+  height: 100%;
+  border-radius: 1.25rem;
+}
+.dashboard-shell .price-card { display: flex; flex-direction: column; }
+.dashboard-shell .price-card > h2 { margin-bottom: .75rem; }
+.dashboard-shell .price-bars {
+  display: flex;
+  align-items: end;
+  min-height: 9.25rem;
+  flex: 1;
+  gap: clamp(.4rem, 1vw, .85rem);
+  padding: 0 .3rem;
+  border-bottom: 1px solid var(--border);
+}
+.dashboard-shell .price-bar {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: .3rem;
+  color: var(--text-muted);
+  font-size: .72rem;
+}
+.dashboard-shell .price-bar i { display: block; width: min(100%, 1.9rem); height: 45%; border-radius: 1rem 1rem 0 0; background: #f7cfad; }
+.dashboard-shell .price-bar--1 i,
+.dashboard-shell .price-bar--2 i { height: 48%; }
+.dashboard-shell .price-bar--3 i { height: 85%; }
+.dashboard-shell .price-bar--4 i { height: 88%; }
+.dashboard-shell .price-bar--5 i { height: 62%; }
+.dashboard-shell .price-bar--6 i { height: 50%; }
+.dashboard-shell .price-bar.current i { background: var(--orange); }
+.dashboard-shell .price-bar.current span { color: var(--orange); font-weight: 800; }
+.dashboard-shell .price-bar b { padding-bottom: .25rem; font-size: .7rem; }
+
+.dashboard-shell .dashboard-net {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0b6b5d url(../images/card-networth-dark.jpg) center / cover;
+  color: #fff;
+}
+.dashboard-shell .dashboard-net > h2 { font-size: 1rem; }
+.dashboard-shell .dashboard-net p { margin-top: auto; color: rgba(255, 255, 255, .78); font-size: .75rem; }
+.dashboard-shell .net-value { display: flex; align-items: center; gap: .8rem; margin: auto 0 .85rem; }
+.dashboard-shell .net-value > div:last-child { min-width: 0; }
+.dashboard-shell .net-value b { display: block; font-size: clamp(1.2rem, 2vw, 1.55rem); overflow-wrap: anywhere; }
+.dashboard-shell .net-value span { display: inline-flex; margin-top: .35rem; padding: .2rem .5rem; border-radius: var(--r-pill); background: var(--lime); color: var(--lime-text); font-size: .68rem; font-weight: 800; }
+.dashboard-shell .dashboard-net .ring { display: grid; width: 4rem; height: 4rem; flex: none; border-radius: 50%; place-items: center; position: relative; background: conic-gradient(var(--lime) 16.66%, rgba(255, 255, 255, .2) 0); font-size: .75rem; font-weight: 800; }
+.dashboard-shell .dashboard-net .ring::before { content: ""; position: absolute; inset: .5rem; border-radius: 50%; background: var(--teal-800); }
+.dashboard-shell .dashboard-net .ring span { position: relative; margin: 0; padding: 0; background: transparent; color: #fff; font-size: .75rem; }
+.dashboard-shell .dashboard-net .ring--2 { background: conic-gradient(var(--lime) 33.33%, rgba(255, 255, 255, .2) 0); }
+.dashboard-shell .dashboard-net .ring--3 { background: conic-gradient(var(--lime) 50%, rgba(255, 255, 255, .2) 0); }
+.dashboard-shell .dashboard-net .ring--4 { background: conic-gradient(var(--lime) 66.66%, rgba(255, 255, 255, .2) 0); }
+.dashboard-shell .dashboard-net .ring--5 { background: conic-gradient(var(--lime) 83.33%, rgba(255, 255, 255, .2) 0); }
+.dashboard-shell .dashboard-net .ring--6 { background: conic-gradient(var(--lime) 100%, rgba(255, 255, 255, .2) 0); }
+
+.dashboard-shell .activity-card { min-height: clamp(13rem, 22vh, 16.5rem); padding: clamp(1rem, 1.6vw, 1.35rem); }
+.dashboard-shell .activity-card .card-head { margin-bottom: .45rem; }
+.dashboard-shell .activity-card .tbl { min-width: 34rem; font-size: .78rem; }
+.dashboard-shell .activity-card .tbl th { font-size: .68rem; }
+.dashboard-shell .activity-card .tbl td { padding: .65rem .6rem; }
+
+.dashboard-shell .dashboard-panel { min-width: 0; padding: clamp(.8rem, 1.2vw, 1.1rem); display: flex; flex-direction: column; gap: .85rem; background: linear-gradient(180deg, #1e5860, #123d42); color: #fff; }
+.dashboard-shell .dashboard-panel-art { height: clamp(7.2rem, 11vw, 9.7rem); border-radius: .85rem; background: url(../images/bg-terrace.jpg) center / cover; }
+.dashboard-shell .dashboard-panel h3 { font-size: 1rem; }
+.dashboard-shell .dashboard-panel .market-alert { padding: .75rem; border: 1px solid rgba(174, 231, 163, .45); border-radius: .75rem; background: #0e7162; }
+.dashboard-shell .dashboard-panel .market-alert b { display: block; color: #ffcf53; font-size: .72rem; }
+.dashboard-shell .dashboard-panel .market-alert p { margin-top: .25rem; font-size: .72rem; line-height: 1.45; }
+.dashboard-shell .dashboard-panel .panel-section-label { color: rgba(255, 255, 255, .7); font-size: .7rem; }
+.dashboard-shell .dashboard-panel .schedule-item { display: flex; align-items: center; gap: .6rem; padding: .7rem; border-radius: .75rem; background: #0d7567; }
+.dashboard-shell .dashboard-panel .schedule-item > span { display: grid; width: 2rem; height: 2rem; flex: none; border-radius: 50%; place-items: center; background: #fff; color: var(--teal-700); }
+.dashboard-shell .dashboard-panel .schedule-item > div { min-width: 0; }
+.dashboard-shell .dashboard-panel .schedule-item b,
+.dashboard-shell .dashboard-panel .schedule-item small { display: block; font-size: .72rem; }
+.dashboard-shell .dashboard-panel .schedule-item small { margin-top: .14rem; color: rgba(255, 255, 255, .72); font-size: .65rem; }
+.dashboard-shell .dashboard-panel .schedule-item b,
+.dashboard-shell .dashboard-panel .schedule-item small { overflow-wrap: anywhere; }
+.dashboard-shell .dashboard-panel .panel-all-notices { margin-top: auto; padding: .3rem 0; color: #ffcf53; font-size: .72rem; font-weight: 800; }
+.mobile-app-brand { display: none; }
+.mobile-notification-count { display: none; }
+/* Only one market panel is rendered at a time. The explicit selectors avoid
+   the generic .dashboard-panel display rule winning through specificity. */
+.dashboard-shell .dashboard-panel--desktop,
+.dashboard-shell .dashboard-panel--mobile { display: none; }
+.dashboard-topbar .userbox { display: flex; align-items: center; }
+.dashboard-topbar .avatar { border: 0; cursor: pointer; }
+.dashboard-topbar .menu { top: calc(100% + .45rem); right: 0; min-width: 11rem; }
+.dashboard-topbar .menu[hidden] { display: none; }
+.dashboard-topbar .menu .who { display: block; padding: .65rem .75rem; border-bottom: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: .75rem; font-weight: 700; }
+
+body.has-persistent-sidebar .dashboard-shell.sidebar-persisted { grid-template-columns: minmax(0, 1fr) clamp(16rem, 20vw, 19rem); }
+@media (min-width: 1181px) {
+  .dashboard-shell .dashboard-panel--desktop { display: flex; }
+}
+@media (max-width: 1180px) {
+  .dashboard-shell,
+  .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-grid { grid-template-areas: "season" "stats" "lower" "activity"; }
+  .dashboard-shell .dashboard-panel { display: none; }
+  body.has-persistent-sidebar .dashboard-shell.sidebar-persisted { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .dashboard-shell { background-attachment: scroll; }
+  .dashboard-topbar {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+      "brand round bell avatar"
+      "title title action action";
+    align-items: center;
+    gap: .7rem .45rem;
+    margin: 0;
+    padding: 0 1rem .75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .mobile-app-brand { display: inline-flex; grid-area: brand; align-items: center; gap: .45rem; min-width: 0; color: var(--teal-900); }
+  .mobile-app-brand .mark { display: grid; width: 2.25rem; height: 2.25rem; flex: none; border: 1px solid var(--teal-100); border-radius: 50%; place-items: center; background: var(--teal-50); color: var(--teal-700); }
+  .mobile-app-brand .mark svg { width: 1rem; height: 1rem; }
+  .mobile-app-brand > span:last-child { display: grid; min-width: 0; line-height: 1.05; }
+  .mobile-app-brand b { font-size: .68rem; letter-spacing: -.02em; }
+  .mobile-app-brand small { margin-top: .15rem; color: var(--text-muted); font-size: .48rem; font-weight: 700; letter-spacing: .12em; }
+  .dashboard-topbar .ttl { grid-area: title; min-width: 0; flex: none; margin: 0; }
+  .dashboard-topbar .ttl small { font-size: .75rem; }
+  .dashboard-topbar .ttl h1 { font-size: 1.3rem; }
+  .dashboard-topbar .dash-round { grid-area: round; order: initial; min-height: 2rem; padding: .4rem .55rem; font-size: .65rem; }
+  .dashboard-topbar .dash-round::before { width: .28rem; height: .28rem; margin-right: 1.28rem; box-shadow: .4rem 0 0 #ffc964, .8rem 0 0 #82c8c0, 1.2rem 0 0 #dce8e5; }
+  .dashboard-topbar > .badge { display: none; }
+  .dashboard-topbar .btn { grid-area: action; min-height: 2.5rem; margin-left: 0; padding-inline: .9rem; font-size: .75rem; }
+  .dashboard-topbar .iconbtn { grid-area: bell; width: 2.25rem; height: 2.25rem; box-shadow: none; border: 1px solid var(--border); }
+  .dashboard-topbar .mobile-notification-count { display: grid; position: absolute; top: -.3rem; right: -.28rem; min-width: 1rem; height: 1rem; padding-inline: .18rem; border: 2px solid #fff; border-radius: var(--r-pill); place-items: center; background: var(--orange); color: var(--text); font-size: .56rem; font-weight: 800; line-height: 1; }
+  .dashboard-topbar .userbox { grid-area: avatar; }
+  .dashboard-topbar .avatar { width: 2.25rem; height: 2.25rem; box-shadow: none; }
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "usdg rice"
+      "gold shipment"
+      "season season"
+      "lower lower"
+      "market market"
+      "activity activity";
+    gap: 1rem .75rem;
+  }
+  .dashboard-stats { display: contents; }
+  .dashboard-stats .stat--usdg { grid-area: usdg; }
+  .dashboard-stats .stat--lua { grid-area: rice; }
+  .dashboard-stats .stat--vang { grid-area: gold; }
+  .dashboard-stats .stat--ship { grid-area: shipment; }
+  .dashboard-stats .stat { min-height: 5.5rem; padding: .75rem; }
+  .dashboard-lower { grid-template-columns: 1fr; }
+  .dashboard-shell .dashboard-panel--desktop { display: none; }
+  .dashboard-shell .dashboard-panel--mobile {
+    display: flex;
+    grid-area: market;
+    min-height: 14.4rem;
+    padding: 1rem;
+    overflow: hidden;
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-1);
+  }
+  .dashboard-shell .dashboard-panel--mobile .dashboard-panel-art,
+  .dashboard-shell .dashboard-panel--mobile .panel-section-label,
+  .dashboard-shell .dashboard-panel--mobile .schedule-item--shipment,
+  .dashboard-shell .dashboard-panel--mobile .panel-all-notices { display: none; }
+  .dashboard-shell .dashboard-panel--mobile .market-alert,
+  .dashboard-shell .dashboard-panel--mobile .schedule-item { min-height: 4.75rem; }
+  .dashboard-shell .season-card { min-height: 9.75rem; padding: 1rem; }
+  .dashboard-shell .season-card .card-head { margin-bottom: .25rem; }
+  .dashboard-shell .season-card h2 { font-size: 1rem; }
+  .dashboard-shell .season-card .hint { font-size: .7rem; }
+  .dashboard-shell .season-stages { padding-inline: 0; }
+  .dashboard-shell .season-stages { padding-block: .65rem .2rem; }
+  .dashboard-shell .season-stages::before { top: 2.35rem; }
+  .dashboard-shell .season-stage > span { width: 2rem; height: 2rem; }
+  .dashboard-shell .season-stage b { font-size: .72rem; }
+  .dashboard-shell .season-stage small { font-size: .66rem; }
+  .dashboard-shell .season-status { gap: .45rem; margin-top: 0; padding-top: .5rem; }
+  .dashboard-shell .season-status p { font-size: .7rem; }
+  .dashboard-shell .season-status .btn { min-height: 2rem; margin-left: 0; padding-inline: .75rem; }
+  .dashboard-shell .price-card { min-height: 10.25rem; }
+  .dashboard-shell .dashboard-net { min-height: 7.25rem; }
+  .dashboard-shell .dashboard-net p { display: none; }
+  .dashboard-shell .dashboard-net .net-value { margin: auto 0 0; }
+  .dashboard-shell .activity-card .table-wrap { margin-inline: -.5rem; }
+  .dashboard-shell .activity-card .tbl { min-width: 31rem; }
+}

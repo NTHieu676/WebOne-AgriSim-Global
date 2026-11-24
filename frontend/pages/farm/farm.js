@@ -1,6 +1,7 @@
 import { apiRequest } from "../../services/api/apiClient.js";
 import { confirmDialog } from "../../services/ui/dialog.js";
 import { auth } from "../../services/firebase/firebase.js";
+import { getRuntimeProfile } from "../../services/demo/demoSession.js";
 
 const A = window.AgriSim;
 const app = document.getElementById("app");
@@ -123,7 +124,8 @@ try {
   if (!game) window.location.replace("../game/startgame.html");
   if (status === "FINISHED" || game?.status === "FINISHED") window.location.replace("../game/endgame.html");
 
-  const playerName = auth.currentUser?.displayName?.trim() || auth.currentUser?.email?.split("@")[0] || "Nông dân";
+  const runtimeProfile = getRuntimeProfile();
+  const playerName = runtimeProfile?.displayName?.trim() || auth.currentUser?.displayName?.trim() || auth.currentUser?.email?.split("@")[0] || "Nông dân";
   const emptyCount = plots.filter((plot) => plot.status === "EMPTY").length;
   const readyPlot = plots.find((plot) => plot.status === "READY");
   const farmStatus = readyPlot ? "Sẵn sàng thu hoạch" : emptyCount ? "Sẵn sàng gieo lúa" : "Đang sinh trưởng";

@@ -1,6 +1,7 @@
 import { auth } from "../../services/firebase/firebase.js";
 import { A, fmt, gameData, shell } from "../../services/ui/gameScreen.js";
 import { apiRequest } from "../../services/api/apiClient.js";
+import { getRuntimeProfile } from "../../services/demo/demoSession.js";
 import { alertDialog, confirmDialog, numberDialog } from "../../services/ui/dialog.js";
 
 const app = document.getElementById("app");
@@ -16,7 +17,7 @@ function dateLabel(value) {
 
 try {
   const { game, lots = [], shipments = [] } = await gameData();
-  const user = auth.currentUser;
+  const user = getRuntimeProfile() || auth.currentUser;
   const displayName = user?.displayName || "Nông dân";
   const email = user?.email || "Chưa có email";
   const initials = displayName.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();

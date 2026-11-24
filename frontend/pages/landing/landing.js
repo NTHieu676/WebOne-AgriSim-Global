@@ -1,5 +1,6 @@
 import { observeAuth } from "../../services/firebase/auth.js";
 import { apiRequest } from "../../services/api/apiClient.js";
+import { getRuntimeProfile } from "../../services/demo/demoSession.js";
 
 const A = window.AgriSim;
 const app = document.getElementById("app");
@@ -21,7 +22,18 @@ function render(session = { signedIn: false, destination: "../auth/register.html
 }
 
 render();
+const demoProfile = getRuntimeProfile();
+if (demoProfile) {
+  let destination = "../game/startgame.html";
+  try {
+    const result = await apiRequest("/game/dashboard");
+    const game = result.data?.game;
+    if (game) destination = game.status === "FINISHED" ? "../game/endgame.html" : "../dashboard/dashboard.html";
+  } catch { /* A fresh demo session can always start a new game. */ }
+  render({ signedIn: true, destination });
+}
 observeAuth(async (user) => {
+  if (getRuntimeProfile()) return;
   if (!user) return render();
   let destination = "../game/startgame.html";
   try {

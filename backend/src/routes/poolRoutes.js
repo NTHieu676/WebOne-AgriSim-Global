@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 const { preview, swap } = require("../controllers/poolController");
 const router = express.Router();
 router.post("/quote", verifyToken, preview);

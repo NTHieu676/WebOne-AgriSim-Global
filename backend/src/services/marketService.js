@@ -54,7 +54,9 @@ async function ship(uid, lotId, quantity, destination, requestId) {
             if (lot.status !== "AVAILABLE" || Number(lot.qualityPercent) <= 0 || quantity > Number(lot.quantity)) throw fail("This lot cannot be shipped in that quantity", 422);
             if (lot.region === destination) throw fail("Destination must differ from the lot region", 400);
             const scenario = await configService.getRound(game.currentRound);
-            const shippingFeeUsd = quantity * 0.5 * scenario.shippingMultiplier;
+            const { simulation } = await configService.getConfig();
+            const unitCost = Number.isFinite(Number(simulation?.SHIPPING_COST_PER_UNIT)) ? Number(simulation.SHIPPING_COST_PER_UNIT) : 0.5;
+            const shippingFeeUsd = quantity * unitCost * scenario.shippingMultiplier;
             if (Number(game.walletUsdG) < shippingFeeUsd) throw fail("Insufficient USDG for shipping", 422);
             const remaining = Number(lot.quantity) - quantity;
             if (remaining === 0) lotRepository.remove(transaction, lotSnapshot); else lotRepository.update(transaction, lotSnapshot, { quantity: remaining });

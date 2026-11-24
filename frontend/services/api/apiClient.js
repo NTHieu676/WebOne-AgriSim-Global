@@ -1,6 +1,7 @@
 import { auth } from "../firebase/firebase.js";
 import { observeAuth } from "../firebase/auth.js";
 import { API_BASE_URL } from "../../config/apiConfig.js";
+import { demoRequest, isDemoSession } from "../demo/demoSession.js";
 
 // ==============================
 // API CLIENT
@@ -20,6 +21,9 @@ function getAuthenticatedUser() {
 }
 
 export async function apiRequest(endpoint, options = {}) {
+    // Demo never obtains a Firebase token and never sends a network request.
+    // Its whole state lives in sessionStorage and is discarded with the session.
+    if (isDemoSession()) return demoRequest(endpoint, options);
     const {
         requireAuth = true,
         forceTokenRefresh = false,

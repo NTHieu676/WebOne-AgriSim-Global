@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 const { listPlots, plant, harvest, buyPlot } = require("../controllers/plotController");
 
 const router = express.Router();

@@ -6,9 +6,7 @@ document.body.setAttribute("data-bg", "terrace");
 const app = document.getElementById("app");
 app.className = "auth";
 app.innerHTML = `
-  <a class="brand" href="../landing/landing.html" aria-label="Về trang giới thiệu"><span class="mark">${A.icon("leaf")}</span><div><b>AGRISIM</b><small>GLOBAL</small></div></a>
-  <a class="auth-back" href="../landing/landing.html">${A.icon("arrow")}<span>Về trang giới thiệu</span></a>
-  <form class="auth-card" id="register-form" novalidate>
+  <main class="login-stage register-stage"><a class="login-brand" href="../landing/landing.html" aria-label="Về trang giới thiệu"><span class="mark"><img src="../../assets/images/SVG.svg" alt=""></span><span><b>AGRISIM</b><small>GLOBAL</small></span></a><form class="auth-card register-card" id="register-form" novalidate>
     <h1>Tạo tài khoản</h1><p class="lead">Tạo tài khoản qua Firebase Authentication.</p>
     <div class="banner banner-error" id="global-error" role="alert" hidden></div>
     <div class="field"><label for="name">Tên hiển thị</label><input class="input" id="name" autocomplete="name" placeholder="Ví dụ: Minh Anh" maxlength="40"><div class="err-text" id="name-error" hidden></div></div>
@@ -17,7 +15,7 @@ app.innerHTML = `
     <div class="field"><label for="password-confirm">Xác nhận mật khẩu</label><div class="input-wrap"><input class="input" id="password-confirm" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu"><button type="button" class="eye" data-password="password-confirm" aria-label="Hiện mật khẩu">${A.icon("eye")}</button></div><div class="err-text" id="password-confirm-error" hidden></div></div>
     <button class="btn btn-primary btn-block btn-lg" id="submit" type="submit">Đăng ký</button>
     <div class="foot">Đã có tài khoản? <a href="login.html">Đăng nhập</a></div>
-  </form>`;
+  </form></main>`;
 
 const $ = (id) => document.getElementById(id);
 
@@ -73,9 +71,7 @@ $("register-form").addEventListener("submit", async (event) => {
     try {
         await register(displayName, email, password);
         await logout();
-        app.innerHTML = `
-          <a class="brand" href="../landing/landing.html"><span class="mark">${A.icon("leaf")}</span><div><b>AGRISIM</b><small>GLOBAL</small></div></a>
-          <div class="auth-card" style="text-align:center"><div class="empty"><div class="ic" style="background:var(--success-bg);color:var(--success)">${A.icon("check")}</div><h3>Tạo tài khoản thành công</h3><p>Hãy đăng nhập để Firebase và backend xác minh phiên của bạn.</p><div class="acts"><a class="btn btn-primary" href="login.html">Đến trang đăng nhập</a></div></div></div>`;
+        app.innerHTML = `<main class="login-stage register-stage"><a class="login-brand" href="../landing/landing.html"><span class="mark"><img src="../../assets/images/SVG.svg" alt=""></span><span><b>AGRISIM</b><small>GLOBAL</small></span></a><div class="auth-card register-card register-success"><div class="empty"><div class="ic" style="background:var(--success-bg);color:var(--success)">${A.icon("check")}</div><h3>Tạo tài khoản thành công</h3><p>Hãy đăng nhập để Firebase và backend xác minh phiên của bạn.</p><div class="acts"><a class="btn btn-primary" href="login.html">Đến trang đăng nhập</a></div></div></div></main>`;
     } catch (error) {
         setBusy(false);
         const banner = $("global-error");
